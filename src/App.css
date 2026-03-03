@@ -1,0 +1,80 @@
+/* App-specific styles */
+
+.app {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+.app main {
+    flex: 1;
+}
+
+/* Loading Screen - Light */
+.loading-screen {
+    position: fixed;
+    inset: 0;
+    background: var(--color-white);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+}
+
+.loading-content {
+    text-align: center;
+}
+
+.loading-logo {
+    width: 120px;
+    height: 120px;
+    border-radius: var(--radius-2xl);
+    background: var(--color-primary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto var(--space-xl);
+    animation: pulse-glow 2s ease-in-out infinite;
+}
+
+.logo-text {
+    font-family: var(--font-display);
+    font-size: 3rem;
+    font-weight: 700;
+    color: var(--color-white);
+}
+
+.loading-bar {
+    width: 200px;
+    height: 4px;
+    background: var(--color-sand);
+    border-radius: var(--radius-full);
+    overflow: hidden;
+    margin: 0 auto;
+}
+
+.loading-bar-fill {
+    height: 100%;
+    width: 40%;
+    background: var(--color-primary);
+    border-radius: var(--radius-full);
+    animation: loading 1.5s ease-in-out infinite;
+}
+
+@keyframes loading {
+    0% {
+        transform: translateX(-100%);
+    }
+
+    100% {
+        transform: translateX(350%);
+    }
+}
+
+.loading-text {
+    color: var(--color-taupe);
+    margin-top: var(--space-lg);
+    font-size: 0.875rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+}

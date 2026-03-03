@@ -1,0 +1,366 @@
+import { useState } from 'react';
+import { Plus, Edit, Trash2, FolderTree, ChevronRight } from 'lucide-react';
+import useStore from '../../store/useStore';
+import EditableSelect from '../../components/common/EditableSelect';
+
+const CategoryManager = () => {
+    const {
+        categories,
+        subcategories,
+        addCategory,
+        updateCategory,
+        deleteCategory,
+        addSubcategory,
+        updateSubcategory,
+        deleteSubcategory,
+        products
+    } = useStore();
+
+    const [editingCategory, setEditingCategory] = useState(null);
+    const [editingSubcategory, setEditingSubcategory] = useState(null);
+    const [newCategory, setNewCategory] = useState({ name: '', description: '' });
+    const [newSubcategory, setNewSubcategory] = useState({ categoryId: '', name: '', description: '' });
+    const [showAddCategory, setShowAddCategory] = useState(false);
+    const [showAddSubcategory, setShowAddSubcategory] = useState(false);
+
+    // Get product count for category
+    const getCategoryProductCount = (categoryId) => {
+        return products.filter(p => p.categoryId === categoryId).length;
+    };
+
+    // Get product count for subcategory
+    const getSubcategoryProductCount = (subcategoryId) => {
+        return products.filter(p => p.subcategoryId === subcategoryId).length;
+    };
+
+    // Get subcategories for a category
+    const getSubcategoriesForCategory = (categoryId) => {
+        return subcategories.filter(s => s.categoryId === categoryId);
+    };
+
+    // Handle add category
+    const handleAddCategory = () => {
+        if (newCategory.name.trim()) {
+            addCategory(newCategory);
+            setNewCategory({ name: '', description: '' });
+            setShowAddCategory(false);
+        }
+    };
+
+    // Handle add subcategory
+    const handleAddSubcategory = () => {
+        if (newSubcategory.name.trim() && newSubcategory.categoryId) {
+            addSubcategory({
+                ...newSubcategory,
+                categoryId: parseInt(newSubcategory.categoryId)
+            });
+            setNewSubcategory({ categoryId: '', name: '', description: '' });
+            setShowAddSubcategory(false);
+        }
+    };
+
+    // Handle delete category
+    const handleDeleteCategory = (categoryId, categoryName) => {
+        const productCount = getCategoryProductCount(categoryId);
+        const subCount = getSubcategoriesForCategory(categoryId).length;
+
+        if (productCount > 0) {
+            alert(`Cannot delete "${categoryName}" - it has ${productCount} products assigned.`);
+            return;
+        }
+
+        if (subCount > 0) {
+            alert(`Cannot delete "${categoryName}" - it has ${subCount} subcategories. Delete subcategories first.`);
+            return;
+        }
+
+        if (window.confirm(`Delete category "${categoryName}"?`)) {
+            deleteCategory(categoryId);
+        }
+    };
+
+    // Handle delete subcategory
+    const handleDeleteSubcategory = (subcategoryId, subcategoryName) => {
+        const productCount = getSubcategoryProductCount(subcategoryId);
+
+        if (productCount > 0) {
+            alert(`Cannot delete "${subcategoryName}" - it has ${productCount} products assigned.`);
+            return;
+        }
+
+        if (window.confirm(`Delete subcategory "${subcategoryName}"?`)) {
+            deleteSubcategory(subcategoryId);
+        }
+    };
+
+    return (
+        <div className="category-manager">
+            {/* Header */}
+            <div className="admin-header">
+                <div className="admin-header__title">
+                    <h1>Categories</h1>
+                    <p>Manage your product categories and subcategories</p>
+                </div>
+                <div className="admin-header__actions">
+                    <button
+                        className="btn btn-secondary"
+                        onClick={() => setShowAddSubcategory(!showAddSubcategory)}
+                    >
+                        <Plus size={18} />
+                        Add Subcategory
+                    </button>
+                    <button
+                        className="btn btn-primary"
+                        onClick={() => setShowAddCategory(!showAddCategory)}
+                    >
+                        <Plus size={18} />
+                        Add Category
+                    </button>
+                </div>
+            </div>
+
+            {/* Add Category Form */}
+            {showAddCategory && (
+                <div className="admin-form" style={{ marginBottom: '1.5rem', padding: '1.5rem' }}>
+                    <h3 style={{ color: 'var(--text-primary)', marginBottom: '1rem', fontSize: '1rem' }}>
+                        New Category
+                    </h3>
+                    <div className="form-row">
+                        <div className="form-group" style={{ marginBottom: 0 }}>
+                            <input
+                                type="text"
+                                value={newCategory.name}
+                                onChange={(e) => setNewCategory({ ...newCategory, name: e.target.value })}
+                                placeholder="Category name"
+                            />
+                        </div>
+                        <div className="form-group" style={{ marginBottom: 0, flex: 2 }}>
+                            <input
+                                type="text"
+                                value={newCategory.description}
+                                onChange={(e) => setNewCategory({ ...newCategory, description: e.target.value })}
+                                placeholder="Description (optional)"
+                            />
+                        </div>
+                        <button className="btn btn-primary" onClick={handleAddCategory}>
+                            Add
+                        </button>
+                        <button className="btn btn-secondary" onClick={() => setShowAddCategory(false)}>
+                            Cancel
+                        </button>
+                    </div>
+                </div>
+            )}
+
+            {/* Add Subcategory Form */}
+            {showAddSubcategory && (
+                <div className="admin-form" style={{ marginBottom: '1.5rem', padding: '1.5rem' }}>
+                    <h3 style={{ color: 'var(--text-primary)', marginBottom: '1rem', fontSize: '1rem' }}>
+                        New Subcategory
+                    </h3>
+                    <div className="form-row">
+                        <div className="form-group" style={{ marginBottom: 0 }}>
+                            <div className="form-group" style={{ marginBottom: 0 }}>
+                                <EditableSelect
+                                    options={categories}
+                                    value={newSubcategory.categoryId}
+                                    onChange={(e) => setNewSubcategory({ ...newSubcategory, categoryId: e.target.value })}
+                                    onAdd={(name) => addCategory({ name, description: '' })}
+                                    placeholder="Select Category"
+                                />
+                            </div>
+                        </div>
+                        <div className="form-group" style={{ marginBottom: 0 }}>
+                            <input
+                                type="text"
+                                value={newSubcategory.name}
+                                onChange={(e) => setNewSubcategory({ ...newSubcategory, name: e.target.value })}
+                                placeholder="Subcategory name"
+                            />
+                        </div>
+                        <div className="form-group" style={{ marginBottom: 0, flex: 2 }}>
+                            <input
+                                type="text"
+                                value={newSubcategory.description}
+                                onChange={(e) => setNewSubcategory({ ...newSubcategory, description: e.target.value })}
+                                placeholder="Description (optional)"
+                            />
+                        </div>
+                        <button className="btn btn-primary" onClick={handleAddSubcategory}>
+                            Add
+                        </button>
+                        <button className="btn btn-secondary" onClick={() => setShowAddSubcategory(false)}>
+                            Cancel
+                        </button>
+                    </div>
+                </div>
+            )}
+
+            {/* Categories List */}
+            <div className="admin-table-container">
+                {categories.length === 0 ? (
+                    <div className="empty-state">
+                        <div className="empty-state__icon">
+                            <FolderTree size={40} />
+                        </div>
+                        <h3>No categories yet</h3>
+                        <p>Create your first category to organize products.</p>
+                        <button className="btn btn-primary" onClick={() => setShowAddCategory(true)}>
+                            <Plus size={18} />
+                            Add Category
+                        </button>
+                    </div>
+                ) : (
+                    <div style={{ padding: '1rem' }}>
+                        {categories.map(category => (
+                            <div key={category.id} style={{ marginBottom: '1rem' }}>
+                                {/* Category Row */}
+                                <div style={{
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    padding: '1rem',
+                                    background: 'rgba(0, 0, 0, 0.2)',
+                                    borderRadius: '10px',
+                                    marginBottom: '0.5rem'
+                                }}>
+                                    <FolderTree size={20} style={{ color: 'var(--accent)', marginRight: '1rem' }} />
+
+                                    {editingCategory === category.id ? (
+                                        <input
+                                            type="text"
+                                            defaultValue={category.name}
+                                            onBlur={(e) => {
+                                                updateCategory(category.id, { name: e.target.value });
+                                                setEditingCategory(null);
+                                            }}
+                                            onKeyDown={(e) => {
+                                                if (e.key === 'Enter') {
+                                                    updateCategory(category.id, { name: e.target.value });
+                                                    setEditingCategory(null);
+                                                }
+                                            }}
+                                            autoFocus
+                                            style={{
+                                                background: 'rgba(0, 0, 0, 0.3)',
+                                                border: '1px solid var(--accent)',
+                                                borderRadius: '6px',
+                                                padding: '0.5rem',
+                                                color: 'var(--text-primary)',
+                                                width: '200px'
+                                            }}
+                                        />
+                                    ) : (
+                                        <span style={{ color: 'var(--text-primary)', fontWeight: 500, flex: 1 }}>
+                                            {category.name}
+                                        </span>
+                                    )}
+
+                                    <span style={{
+                                        color: 'var(--text-muted)',
+                                        fontSize: '0.85rem',
+                                        marginRight: '1rem'
+                                    }}>
+                                        {getCategoryProductCount(category.id)} products
+                                    </span>
+
+                                    <div className="action-btns">
+                                        <button
+                                            className="action-btn action-btn--edit"
+                                            onClick={() => setEditingCategory(category.id)}
+                                            title="Edit"
+                                        >
+                                            <Edit size={16} />
+                                        </button>
+                                        <button
+                                            className="action-btn action-btn--delete"
+                                            onClick={() => handleDeleteCategory(category.id, category.name)}
+                                            title="Delete"
+                                        >
+                                            <Trash2 size={16} />
+                                        </button>
+                                    </div>
+                                </div>
+
+                                {/* Subcategories */}
+                                {getSubcategoriesForCategory(category.id).map(sub => (
+                                    <div key={sub.id} style={{
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        padding: '0.75rem 1rem',
+                                        marginLeft: '2rem',
+                                        background: 'rgba(255, 255, 255, 0.02)',
+                                        borderRadius: '8px',
+                                        marginBottom: '0.25rem',
+                                        borderLeft: '2px solid rgba(212, 175, 55, 0.3)'
+                                    }}>
+                                        <ChevronRight size={16} style={{ color: 'var(--text-muted)', marginRight: '0.5rem' }} />
+
+                                        {editingSubcategory === sub.id ? (
+                                            <input
+                                                type="text"
+                                                defaultValue={sub.name}
+                                                onBlur={(e) => {
+                                                    updateSubcategory(sub.id, { name: e.target.value });
+                                                    setEditingSubcategory(null);
+                                                }}
+                                                onKeyDown={(e) => {
+                                                    if (e.key === 'Enter') {
+                                                        updateSubcategory(sub.id, { name: e.target.value });
+                                                        setEditingSubcategory(null);
+                                                    }
+                                                }}
+                                                autoFocus
+                                                style={{
+                                                    background: 'rgba(0, 0, 0, 0.3)',
+                                                    border: '1px solid var(--accent)',
+                                                    borderRadius: '6px',
+                                                    padding: '0.4rem',
+                                                    color: 'var(--text-primary)',
+                                                    width: '180px',
+                                                    fontSize: '0.9rem'
+                                                }}
+                                            />
+                                        ) : (
+                                            <span style={{ color: 'var(--text-secondary)', flex: 1, fontSize: '0.9rem' }}>
+                                                {sub.name}
+                                            </span>
+                                        )}
+
+                                        <span style={{
+                                            color: 'var(--text-muted)',
+                                            fontSize: '0.8rem',
+                                            marginRight: '1rem'
+                                        }}>
+                                            {getSubcategoryProductCount(sub.id)} products
+                                        </span>
+
+                                        <div className="action-btns">
+                                            <button
+                                                className="action-btn action-btn--edit"
+                                                onClick={() => setEditingSubcategory(sub.id)}
+                                                title="Edit"
+                                                style={{ width: '30px', height: '30px' }}
+                                            >
+                                                <Edit size={14} />
+                                            </button>
+                                            <button
+                                                className="action-btn action-btn--delete"
+                                                onClick={() => handleDeleteSubcategory(sub.id, sub.name)}
+                                                title="Delete"
+                                                style={{ width: '30px', height: '30px' }}
+                                            >
+                                                <Trash2 size={14} />
+                                            </button>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        ))}
+                    </div>
+                )}
+            </div>
+        </div>
+    );
+};
+
+export default CategoryManager;

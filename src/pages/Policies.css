@@ -1,0 +1,138 @@
+/* Policies Page - Light Theme */
+
+.policies-page {
+    padding: 4rem 0;
+    background-color: var(--color-cream);
+    min-height: 80vh;
+}
+
+.policies-layout {
+    display: grid;
+    grid-template-columns: 280px 1fr;
+    gap: 3rem;
+    align-items: start;
+}
+
+/* Sidebar */
+.policies-sidebar {
+    background: var(--color-white);
+    padding: 1.5rem;
+    border-radius: var(--radius-xl);
+    box-shadow: var(--shadow-md);
+    position: sticky;
+    top: 100px;
+    border: 1px solid var(--color-sand);
+}
+
+.policies-nav-title {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--color-primary);
+    margin-bottom: 1.5rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid var(--color-sand);
+}
+
+.policies-nav {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.policy-nav-link {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 0.75rem 1rem;
+    color: var(--color-taupe);
+    text-decoration: none;
+    border-radius: var(--radius-md);
+    transition: all 0.2s ease;
+    font-weight: 500;
+}
+
+.policy-nav-link:hover {
+    background-color: var(--color-ivory);
+    color: var(--color-charcoal);
+}
+
+.policy-nav-link.active {
+    background-color: var(--color-primary);
+    color: var(--color-white);
+}
+
+.policy-nav-link.active svg {
+    opacity: 1;
+}
+
+/* Content */
+.policy-content {
+    background: var(--color-white);
+    padding: 3rem;
+    border-radius: var(--radius-xl);
+    box-shadow: var(--shadow-md);
+    border: 1px solid var(--color-sand);
+}
+
+.policy-header {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+    margin-bottom: 2.5rem;
+    padding-bottom: 2rem;
+    border-bottom: 1px solid var(--color-sand);
+}
+
+.policy-icon-wrapper {
+    width: 64px;
+    height: 64px;
+    background-color: var(--color-ivory);
+    border-radius: var(--radius-xl);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--color-primary);
+}
+
+.policy-header h1 {
+    font-size: 2rem;
+    color: var(--color-primary);
+    margin: 0;
+}
+
+.policy-body {
+    color: var(--color-charcoal);
+    line-height: 1.8;
+}
+
+.policy-body h2 {
+    font-size: 1.5rem;
+    color: var(--color-primary);
+    margin-top: 2rem;
+    margin-bottom: 1rem;
+}
+
+.policy-body p {
+    margin-bottom: 1.5rem;
+}
+
+.policy-body ul {
+    margin-bottom: 1.5rem;
+    padding-left: 1.5rem;
+}
+
+.policy-body li {
+    margin-bottom: 0.5rem;
+}
+
+/* Responsive */
+@media (max-width: 900px) {
+    .policies-layout {
+        grid-template-columns: 1fr;
+        gap: 2rem;
+    }
+
+    .policies-sidebar {
+        position: static;
+    }
+}
