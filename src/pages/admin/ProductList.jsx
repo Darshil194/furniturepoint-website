@@ -69,9 +69,12 @@ const ProductList = () => {
         return result;
     }, [products, searchQuery, categoryFilter, statusFilter, sortBy]);
 
-    const handleDelete = (productId, productName) => {
+    const handleDelete = async (productId, productName) => {
         if (window.confirm(`Are you sure you want to delete "${productName}"?`)) {
-            deleteProduct(productId);
+            const success = await deleteProduct(productId);
+            if (!success) {
+                alert('Failed to delete product. Please try again.');
+            }
         }
     };
 

@@ -32,7 +32,8 @@ function App() {
             await Promise.all([
                 useStore.getState().fetchProducts(),
                 useStore.getState().fetchCategories(),
-                useStore.getState().fetchSubcategories()
+                useStore.getState().fetchSubcategories(),
+                useStore.getState().fetchAuxiliaryData()
             ])
         }
         initializeData()

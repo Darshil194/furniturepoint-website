@@ -436,9 +436,24 @@ const useStore = create(
             // ==================
             policies: initialPolicies,
 
+            fetchAuxiliaryData: async () => {
+                try {
+                    const [mRes, cRes, sRes] = await Promise.all([
+                        fetch('https://furniturepoint-website-k3j7.onrender.com/api/materials'),
+                        fetch('https://furniturepoint-website-k3j7.onrender.com/api/colors'),
+                        fetch('https://furniturepoint-website-k3j7.onrender.com/api/styles')
+                    ])
+                    if (mRes.ok) set({ materials: await mRes.json() })
+                    if (cRes.ok) set({ colors: await cRes.json() })
+                    if (sRes.ok) set({ styles: await sRes.json() })
+                } catch (error) {
+                    console.error('Failed to fetch auxiliary data:', error)
+                }
+            },
+
             fetchPolicies: async () => {
                 try {
-                    const response = await fetch('/api/policies')
+                    const response = await fetch('https://furniturepoint-website-k3j7.onrender.com/api/policies')
                     if (response.ok) {
                         const data = await response.json()
                         set({ policies: data })
@@ -451,7 +466,7 @@ const useStore = create(
             updatePolicy: async (type, content) => {
                 try {
                     const policy = get().policies[type]
-                    const response = await fetch(`/api/policies/${type}`, {
+                    const response = await fetch(`https://furniturepoint-website-k3j7.onrender.com/api/policies/${type}`, {
                         method: 'PUT',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({ title: policy?.title || type, content })
@@ -489,7 +504,7 @@ const useStore = create(
             // Product CRUD
             fetchProducts: async () => {
                 try {
-                    const response = await fetch('/api/products')
+                    const response = await fetch('https://furniturepoint-website-k3j7.onrender.com/api/products')
                     if (response.ok) {
                         const data = await response.json()
                         set({ products: data })
@@ -501,7 +516,7 @@ const useStore = create(
 
             addProduct: async (productData) => {
                 try {
-                    const response = await fetch('/api/products', {
+                    const response = await fetch('https://furniturepoint-website-k3j7.onrender.com/api/products', {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify(productData)
@@ -523,7 +538,7 @@ const useStore = create(
                     const currentProduct = get().products.find(p => p.id === productId)
                     const updatedProduct = { ...currentProduct, ...updates }
 
-                    const response = await fetch(`/api/products/${productId}`, {
+                    const response = await fetch(`https://furniturepoint-website-k3j7.onrender.com/api/products/${productId}`, {
                         method: 'PUT',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify(updatedProduct)
@@ -543,7 +558,7 @@ const useStore = create(
             deleteProduct: async (productId) => {
                 try {
                     const product = get().products.find(p => p.id === productId)
-                    const response = await fetch(`/api/products/${productId}`, {
+                    const response = await fetch(`https://furniturepoint-website-k3j7.onrender.com/api/products/${productId}`, {
                         method: 'DELETE'
                     })
                     if (response.ok) {
@@ -581,7 +596,7 @@ const useStore = create(
             // ==================
             fetchCategories: async () => {
                 try {
-                    const response = await fetch('/api/categories')
+                    const response = await fetch('https://furniturepoint-website-k3j7.onrender.com/api/categories')
                     if (response.ok) {
                         const data = await response.json()
                         set({ categories: data })
@@ -593,7 +608,7 @@ const useStore = create(
 
             addCategory: async (categoryData) => {
                 try {
-                    const response = await fetch('/api/categories', {
+                    const response = await fetch('https://furniturepoint-website-k3j7.onrender.com/api/categories', {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify(categoryData)
@@ -611,7 +626,7 @@ const useStore = create(
 
             updateCategory: async (categoryId, updates) => {
                 try {
-                    const response = await fetch(`/api/categories/${categoryId}`, {
+                    const response = await fetch(`https://furniturepoint-website-k3j7.onrender.com/api/categories/${categoryId}`, {
                         method: 'PUT',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify(updates)
@@ -629,7 +644,7 @@ const useStore = create(
 
             deleteCategory: async (categoryId) => {
                 try {
-                    const response = await fetch(`/api/categories/${categoryId}`, {
+                    const response = await fetch(`https://furniturepoint-website-k3j7.onrender.com/api/categories/${categoryId}`, {
                         method: 'DELETE'
                     })
                     if (response.ok) {
@@ -648,7 +663,7 @@ const useStore = create(
             // ==================
             fetchSubcategories: async () => {
                 try {
-                    const response = await fetch('/api/subcategories')
+                    const response = await fetch('https://furniturepoint-website-k3j7.onrender.com/api/subcategories')
                     if (response.ok) {
                         const data = await response.json()
                         set({ subcategories: data })
@@ -660,7 +675,7 @@ const useStore = create(
 
             addSubcategory: async (subcategoryData) => {
                 try {
-                    const response = await fetch('/api/subcategories', {
+                    const response = await fetch('https://furniturepoint-website-k3j7.onrender.com/api/subcategories', {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify(subcategoryData)
@@ -679,7 +694,7 @@ const useStore = create(
             updateSubcategory: async (subcategoryId, updates) => {
                 try {
                     const currentSub = get().subcategories.find(s => s.id === subcategoryId)
-                    const response = await fetch(`/api/subcategories/${subcategoryId}`, {
+                    const response = await fetch(`https://furniturepoint-website-k3j7.onrender.com/api/subcategories/${subcategoryId}`, {
                         method: 'PUT',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({ ...currentSub, ...updates })
@@ -697,7 +712,7 @@ const useStore = create(
 
             deleteSubcategory: async (subcategoryId) => {
                 try {
-                    const response = await fetch(`/api/subcategories/${subcategoryId}`, {
+                    const response = await fetch(`https://furniturepoint-website-k3j7.onrender.com/api/subcategories/${subcategoryId}`, {
                         method: 'DELETE'
                     })
                     if (response.ok) {
@@ -712,24 +727,66 @@ const useStore = create(
             },
 
             // ==================
-            // EXTENDED LOOKUP CRUD (Materials, Colors, Styles)
+            // EXTENDED LOOKUP CRUD (API-connected)
             // ==================
-            addMaterial: (materialName) => {
-                const newMaterial = { id: Date.now(), name: materialName }
-                set({ materials: [...get().materials, newMaterial] })
-                return newMaterial
+            addMaterial: async (materialName) => {
+                try {
+                    const response = await fetch('https://furniturepoint-website-k3j7.onrender.com/api/materials', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ name: materialName })
+                    })
+                    if (response.ok) {
+                        const newMaterial = await response.json()
+                        set({ materials: [...get().materials, newMaterial] })
+                        return newMaterial
+                    }
+                } catch (error) {
+                    console.error('Failed to add material:', error)
+                }
+                const fallback = { id: Date.now(), name: materialName }
+                set({ materials: [...get().materials, fallback] })
+                return fallback
             },
 
-            addColor: (colorName) => {
-                const newColor = { id: Date.now(), name: colorName, hex: '#000000' } // Default hex, can be improved
-                set({ colors: [...get().colors, newColor] })
-                return newColor
+            addColor: async (colorName) => {
+                try {
+                    const response = await fetch('https://furniturepoint-website-k3j7.onrender.com/api/colors', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ name: colorName, hex_code: '#000000' })
+                    })
+                    if (response.ok) {
+                        const newColor = await response.json()
+                        set({ colors: [...get().colors, newColor] })
+                        return newColor
+                    }
+                } catch (error) {
+                    console.error('Failed to add color:', error)
+                }
+                const fallback = { id: Date.now(), name: colorName, hex: '#000000' }
+                set({ colors: [...get().colors, fallback] })
+                return fallback
             },
 
-            addStyle: (styleName) => {
-                const newStyle = { id: Date.now(), name: styleName }
-                set({ styles: [...get().styles, newStyle] })
-                return newStyle
+            addStyle: async (styleName) => {
+                try {
+                    const response = await fetch('https://furniturepoint-website-k3j7.onrender.com/api/styles', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ name: styleName })
+                    })
+                    if (response.ok) {
+                        const newStyle = await response.json()
+                        set({ styles: [...get().styles, newStyle] })
+                        return newStyle
+                    }
+                } catch (error) {
+                    console.error('Failed to add style:', error)
+                }
+                const fallback = { id: Date.now(), name: styleName }
+                set({ styles: [...get().styles, fallback] })
+                return fallback
             },
 
             // ==================
@@ -739,7 +796,7 @@ const useStore = create(
 
             fetchAuditLogs: async () => {
                 try {
-                    const response = await fetch('/api/audit-logs')
+                    const response = await fetch('https://furniturepoint-website-k3j7.onrender.com/api/audit-logs')
                     if (response.ok) {
                         const data = await response.json()
                         set({ auditLog: data })

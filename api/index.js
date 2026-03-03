@@ -377,8 +377,9 @@ app.post('/api/products', async (req, res) => {
         }
 
         // Handle integers for IDs (convert '' to null)
-        const toInt = (val) => val ? parseInt(val) : null;
-        const toFloat = (val) => val ? parseFloat(val) : null;
+        // Helper to safely convert values (correctly handles 0, null, and empty strings)
+        const toInt = (val) => (val !== undefined && val !== null && val !== '') ? parseInt(val) : null;
+        const toFloat = (val) => (val !== undefined && val !== null && val !== '') ? parseFloat(val) : null;
 
         const result = await sql`
             INSERT INTO products (
@@ -419,14 +420,22 @@ app.put('/api/products/:id', async (req, res) => {
                 name = ${p.name},
                 slug = ${p.slug},
                 description = ${p.description},
-                category_id = ${p.categoryId},
-                subcategory_id = ${p.subcategoryId},
-                price = ${p.price},
-                stock_quantity = ${p.stockQuantity},
+                category_id = ${toInt(p.categoryId)},
+                subcategory_id = ${toInt(p.subcategoryId) || (p.subcategoryIds && p.subcategoryIds.length > 0 ? toInt(p.subcategoryIds[0]) : null)},
+                price = ${toFloat(p.price)},
+                stock_quantity = ${toInt(p.stockQuantity)},
                 images = ${JSON.stringify(p.images)},
                 featured = ${p.featured || false},
                 status = ${p.status || 'active'},
                 tags = ${JSON.stringify(p.tags || [])},
+                material_id = ${toInt(p.materialId)},
+                color_id = ${toInt(p.colorId)},
+                style_id = ${toInt(p.styleId)},
+                discount_price = ${toFloat(p.discountPrice)},
+                weight_kg = ${toFloat(p.weightKg)},
+                dimensions = ${JSON.stringify(p.dimensions || {})},
+                assembly_required = ${p.assemblyRequired || false},
+                availability_status = ${p.availabilityStatus || 'in_stock'},
                 updated_at = CURRENT_TIMESTAMP
             WHERE id = ${id}
             RETURNING *
@@ -512,6 +521,94 @@ app.put('/api/policies/:type', async (req, res) => {
             RETURNING *
         `;
         res.json(result[0]);
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ error: err.message });
+    }
+});
+
+
+// =======================
+// MATERIALS
+// =======================
+app.get('/api/materials', async (req, res) => {
+    try {
+        const rows = await sql`SELECT * FROM materials ORDER BY name`;
+        res.json(rows);
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ error: 'Internal Server Error' });
+    }
+});
+
+app.post('/api/materials', async (req, res) => {
+    try {
+        const { name } = req.body;
+        const result = await sql`
+            INSERT INTO materials (name)
+            VALUES (${name})
+            ON CONFLICT (name) DO UPDATE SET name = EXCLUDED.name
+            RETURNING *
+        `;
+        res.status(201).json(result[0]);
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ error: err.message });
+    }
+});
+
+// =======================
+// COLORS
+// =======================
+app.get('/api/colors', async (req, res) => {
+    try {
+        const rows = await sql`SELECT * FROM colors ORDER BY name`;
+        res.json(rows);
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ error: 'Internal Server Error' });
+    }
+});
+
+app.post('/api/colors', async (req, res) => {
+    try {
+        const { name, hex_code } = req.body;
+        const result = await sql`
+            INSERT INTO colors (name, hex_code)
+            VALUES (${name}, ${hex_code || '#000000'})
+            ON CONFLICT (name) DO UPDATE SET hex_code = EXCLUDED.hex_code
+            RETURNING *
+        `;
+        res.status(201).json(result[0]);
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ error: err.message });
+    }
+});
+
+// =======================
+// STYLES
+// =======================
+app.get('/api/styles', async (req, res) => {
+    try {
+        const rows = await sql`SELECT * FROM styles ORDER BY name`;
+        res.json(rows);
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ error: 'Internal Server Error' });
+    }
+});
+
+app.post('/api/styles', async (req, res) => {
+    try {
+        const { name } = req.body;
+        const result = await sql`
+            INSERT INTO styles (name)
+            VALUES (${name})
+            ON CONFLICT (name) DO UPDATE SET name = EXCLUDED.name
+            RETURNING *
+        `;
+        res.status(201).json(result[0]);
     } catch (err) {
         console.error(err);
         res.status(500).json({ error: err.message });

@@ -198,13 +198,22 @@ const ProductForm = () => {
             }
         };
 
-        if (isEditing) {
-            updateProduct(parseInt(id), productData);
-        } else {
-            addProduct(productData);
-        }
+        const submitData = async () => {
+            let success = false;
+            if (isEditing) {
+                success = await updateProduct(parseInt(id), productData);
+            } else {
+                success = await addProduct(productData);
+            }
 
-        navigate('/admin/products');
+            if (success) {
+                navigate('/admin/products');
+            } else {
+                alert('Failed to save product. Please check the console for details.');
+            }
+        };
+
+        submitData();
     };
 
     return (
@@ -571,7 +580,7 @@ const ProductForm = () => {
 
                                 try {
                                     // Visual feedback (optional: add loading state)
-                                    const res = await fetch('http://localhost:3000/api/upload', {
+                                    const res = await fetch('/api/upload', {
                                         method: 'POST',
                                         body: uploadData
                                     });
@@ -643,7 +652,7 @@ const ProductForm = () => {
                             {formData.images.map((img, index) => (
                                 <div key={index} className="image-preview__item" style={{ aspectRatio: '1', borderRadius: '8px', overflow: 'hidden', position: 'relative', border: img.isPrimary ? '2px solid var(--accent)' : '1px solid rgba(255,255,255,0.1)' }}>
                                     <img
-                                        src={img.url.startsWith('http') || img.url.startsWith('/') ? img.url : `http://localhost:3000${img.url}`}
+                                        src={img.url}
                                         alt={`Product ${index}`}
                                         style={{ width: '100%', height: '100%', objectFit: 'cover' }}
                                     />
