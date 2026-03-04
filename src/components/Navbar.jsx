@@ -11,7 +11,7 @@ const glanceData = {
         items: [
             // { img: 'https://images.unsplash.com/photo-1450101499163-c8848c66ca85?w=400&h=300&fit=crop', desc: 'Easy Returns' },
             { img: 'https://images.unsplash.com/photo-1554224155-6726b3ff858f?w=400&h=300&fit=crop', desc: 'Secure Payments' },
-            { img: 'https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?w=400&h=300&fit=crop', desc: 'Free Shipping T&C apply' },
+            { img: 'https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?w=400&h=300&fit=crop', desc: 'Shipping Information' },
             { img: 'https://images.unsplash.com/photo-1556742111-a301076d9d18?w=400&h=300&fit=crop', desc: 'Warranty' },
             { img: 'https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?w=400&h=300&fit=crop', desc: 'Support' }
         ]
