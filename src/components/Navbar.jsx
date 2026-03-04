@@ -151,30 +151,83 @@ function Navbar() {
                         </button>
                     </div>
                 </nav>
-
-                {/* Mobile Menu */}
-                <AnimatePresence>
-                    {isMobileMenuOpen && (
-                        <motion.div
-                            className="navbar__mobile-menu navbar__mobile-menu--open"
-                            initial={{ opacity: 0, height: 0 }}
-                            animate={{ opacity: 1, height: 'auto' }}
-                            exit={{ opacity: 0, height: 0 }}
-                            transition={{ duration: 0.3 }}
-                        >
-                            <ul>
-                                {navItems.map(item => (
-                                    <li key={item.key}>
-                                        <Link to={item.path} onClick={() => window.scrollTo(0, 0)}>
-                                            {item.label}
-                                        </Link>
-                                    </li>
-                                ))}
-                            </ul>
-                        </motion.div>
-                    )}
-                </AnimatePresence>
             </motion.header>
+
+            {/* Mobile Drawer — OUTSIDE header for correct z-index/position */}
+            <AnimatePresence>
+                {isMobileMenuOpen && (
+                    <motion.div
+                        key="drawer-backdrop"
+                        className="mobile-drawer__backdrop"
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        transition={{ duration: 0.3 }}
+                        onClick={() => setIsMobileMenuOpen(false)}
+                    />
+                )}
+            </AnimatePresence>
+
+            <AnimatePresence>
+                {isMobileMenuOpen && (
+                    <motion.div
+                        key="drawer-panel"
+                        className="mobile-drawer"
+                        initial={{ x: '100%' }}
+                        animate={{ x: 0 }}
+                        exit={{ x: '100%' }}
+                        transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
+                    >
+                        {/* Drawer Header */}
+                        <div className="mobile-drawer__header">
+                            <Link to="/" className="navbar__logo" onClick={() => setIsMobileMenuOpen(false)}>
+                                <img
+                                    src="/assets/logo/furniture-point-logo.svg"
+                                    alt="Furniture Point"
+                                    className="logo-image"
+                                />
+                            </Link>
+                            <button
+                                className="mobile-drawer__close"
+                                onClick={() => setIsMobileMenuOpen(false)}
+                                aria-label="Close menu"
+                            >
+                                <X size={24} />
+                            </button>
+                        </div>
+
+                        {/* Drawer Navigation */}
+                        <nav className="mobile-drawer__nav">
+                            {navItems.map(item => (
+                                <Link
+                                    key={item.key}
+                                    to={item.path}
+                                    className={`mobile-drawer__link ${location.pathname === item.path ||
+                                            (item.path !== '/' && location.pathname.startsWith(item.path))
+                                            ? 'active' : ''
+                                        }`}
+                                    onClick={() => {
+                                        setIsMobileMenuOpen(false)
+                                        window.scrollTo(0, 0)
+                                    }}
+                                >
+                                    {item.label}
+                                </Link>
+                            ))}
+                        </nav>
+
+                        {/* Drawer Footer */}
+                        <div className="mobile-drawer__footer">
+                            <a href="tel:+919825038287" className="mobile-drawer__contact">
+                                +91 98250 38287
+                            </a>
+                            <a href="mailto:furniturepointank@gmail.com" className="mobile-drawer__contact">
+                                furniturepointank@gmail.com
+                            </a>
+                        </div>
+                    </motion.div>
+                )}
+            </AnimatePresence>
 
             {/* Full-Width Light Themed Glance Panel */}
             <AnimatePresence>
