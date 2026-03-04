@@ -1,4 +1,5 @@
 import { NavLink, Outlet, useNavigate } from 'react-router-dom';
+import { useEffect } from 'react';
 import {
     LayoutDashboard,
     Package,
@@ -16,6 +17,12 @@ const AdminLayout = () => {
     const { adminUser, logoutAdmin, getStats } = useStore();
     const navigate = useNavigate();
     const stats = getStats();
+
+    // Session management: mark admin panel as active
+    // Auth clearing on SPA navigation is handled in App.jsx via route change detection
+    useEffect(() => {
+        sessionStorage.setItem('fp-admin-active', 'true');
+    }, []);
 
     const handleLogout = () => {
         logoutAdmin();

@@ -96,6 +96,21 @@ CREATE TABLE IF NOT EXISTS audit_logs (
     timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
+-- Inquiries table (contact form submissions)
+CREATE TABLE IF NOT EXISTS inquiries (
+    id SERIAL PRIMARY KEY,
+    name VARCHAR(255) NOT NULL,
+    company_name VARCHAR(255),
+    email VARCHAR(255) NOT NULL,
+    phone VARCHAR(50),
+    product_name VARCHAR(255),
+    quantity INTEGER,
+    project_location VARCHAR(255),
+    message TEXT,
+    status VARCHAR(20) DEFAULT 'pending',
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
 -- Insert sample categories
 INSERT INTO categories (id, name, description) VALUES
     (1, 'Living Room', 'Sofas, chairs, and tables'),

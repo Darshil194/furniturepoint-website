@@ -7,7 +7,7 @@ import {
     Plus,
     ArrowUpRight,
     ArrowDownRight,
-    DollarSign,
+    IndianRupee,
     Boxes,
     PlusCircle,
     Edit,
@@ -21,9 +21,9 @@ const Dashboard = () => {
 
     // Format currency
     const formatCurrency = (amount) => {
-        return new Intl.NumberFormat('en-US', {
+        return new Intl.NumberFormat('en-IN', {
             style: 'currency',
-            currency: 'USD',
+            currency: 'INR',
             minimumFractionDigits: 0
         }).format(amount);
     };
@@ -122,7 +122,7 @@ const Dashboard = () => {
                 <div className="stat-card">
                     <div className="stat-card__header">
                         <div className="stat-card__icon stat-card__icon--primary">
-                            <DollarSign size={24} />
+                            <IndianRupee size={24} />
                         </div>
                     </div>
                     <div className="stat-card__value">{formatCurrency(stats.totalInventoryValue)}</div>
@@ -165,7 +165,7 @@ const Dashboard = () => {
                                             </div>
                                         </div>
                                     </td>
-                                    <td>${product.price}</td>
+                                    <td>₹{product.price}</td>
                                     <td>
                                         <div className="stock-cell">
                                             <span>{product.stockQuantity}</span>

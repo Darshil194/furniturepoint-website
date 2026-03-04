@@ -36,7 +36,7 @@ const AdminLogin = () => {
                             type="email"
                             value={email}
                             onChange={(e) => setEmail(e.target.value)}
-                            placeholder="admin@furniturepoint.com"
+                            placeholder="Enter admin email"
                             required
                         />
                     </div>
@@ -46,15 +46,13 @@ const AdminLogin = () => {
                             type="password"
                             value={password}
                             onChange={(e) => setPassword(e.target.value)}
-                            placeholder="admin123"
+                            placeholder="Enter password"
                             required
                         />
                     </div>
                     {error && <p className="error-message">{error}</p>}
                     <button type="submit" className="login-btn">Login</button>
-                    <div className="demo-hint">
-                        <small>Demo: admin@furniturepoint.com / admin123</small>
-                    </div>
+
                 </form>
             </div>
         </div>

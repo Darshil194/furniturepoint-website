@@ -1,5 +1,5 @@
 import { create } from 'zustand'
-import { persist } from 'zustand/middleware'
+import { persist, createJSONStorage } from 'zustand/middleware'
 
 // ============================================
 // LOOKUP TABLES (Normalized Reference Data)
@@ -383,7 +383,7 @@ We attempt to be as accurate as possible. However, we do not warrant that produc
         title: 'Shipping Information',
         content: `
 ## Shipping Rates
-Standard shipping is free for all orders over $500. For orders under $500, a flat rate of $50 applies.
+Standard shipping is free for all orders over ₹500. For orders under ₹500, a flat rate of ₹50 applies.
 
 ## Delivery Times
 - **Standard Shipping**: 5-7 business days
@@ -842,6 +842,12 @@ const useStore = create(
                 )
 
                 if (user) {
+                    const adminUserData = {
+                        id: user.id,
+                        email: user.email,
+                        name: user.name,
+                        role: user.role
+                    }
                     // Update last login
                     set({
                         users: users.map(u =>
@@ -850,13 +856,12 @@ const useStore = create(
                                 : u
                         ),
                         isAdminLoggedIn: true,
-                        adminUser: {
-                            id: user.id,
-                            email: user.email,
-                            name: user.name,
-                            role: user.role
-                        }
+                        adminUser: adminUserData
                     })
+                    // Persist auth to sessionStorage
+                    try {
+                        sessionStorage.setItem('fp-admin-auth', JSON.stringify({ isAdminLoggedIn: true, adminUser: adminUserData }))
+                    } catch (e) { /* ignore */ }
                     // Log the login
                     get().addAuditLogEntry('login', 'auth', null, `User logged in: ${user.email}`)
                     return true
@@ -870,6 +875,9 @@ const useStore = create(
                     get().addAuditLogEntry('logout', 'auth', null, `User logged out: ${user.email}`)
                 }
                 set({ isAdminLoggedIn: false, adminUser: null })
+                try {
+                    sessionStorage.removeItem('fp-admin-auth')
+                } catch (e) { /* ignore */ }
             },
 
             // Check if current user has a specific permission
@@ -1008,14 +1016,53 @@ const useStore = create(
             },
 
             // ==================
-            // INQUIRIES (unchanged)
+            // INQUIRIES
             // ==================
-            customers: [
-                { id: 1, name: 'John Doe', email: 'john@example.com', inquiry: 'Interested in Velvet Navy Sofa', date: '2025-06-15' },
-                { id: 2, name: 'Jane Smith', email: 'jane@example.com', inquiry: 'Looking for dining set', date: '2025-08-22' },
-                { id: 3, name: 'Mike Johnson', email: 'mike@example.com', inquiry: 'Need bedroom furniture', date: '2025-11-10' },
-                { id: 4, name: 'Sarah Williams', email: 'sarah@example.com', inquiry: 'Office furniture consultation', date: '2025-03-05' }
-            ]
+            inquiries: [],
+
+            fetchInquiries: async () => {
+                try {
+                    const response = await fetch('https://furniturepoint-website-k3j7.onrender.com/api/inquiries')
+                    if (response.ok) {
+                        const data = await response.json()
+                        set({ inquiries: data })
+                    }
+                } catch (error) {
+                    console.error('Failed to fetch inquiries:', error)
+                }
+            },
+
+            updateInquiryStatus: async (id, status) => {
+                try {
+                    const response = await fetch(`https://furniturepoint-website-k3j7.onrender.com/api/inquiries/${id}/status`, {
+                        method: 'PUT',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ status })
+                    })
+                    if (response.ok) {
+                        set({
+                            inquiries: get().inquiries.map(inq =>
+                                inq.id === id ? { ...inq, status } : inq
+                            )
+                        })
+                    }
+                } catch (error) {
+                    console.error('Failed to update inquiry status:', error)
+                }
+            },
+
+            deleteInquiry: async (id) => {
+                try {
+                    const response = await fetch(`https://furniturepoint-website-k3j7.onrender.com/api/inquiries/${id}`, {
+                        method: 'DELETE'
+                    })
+                    if (response.ok) {
+                        set({ inquiries: get().inquiries.filter(inq => inq.id !== id) })
+                    }
+                } catch (error) {
+                    console.error('Failed to delete inquiry:', error)
+                }
+            }
         }),
         {
             name: 'furniture-point-storage',
@@ -1025,13 +1072,30 @@ const useStore = create(
                 subcategories: state.subcategories,
                 policies: state.policies,
                 users: state.users,
-                isAdminLoggedIn: state.isAdminLoggedIn,
-                adminUser: state.adminUser,
                 auditLog: state.auditLog
-            })
+            }),
+            merge: (persistedState, currentState) => {
+                // Strip auth fields from old localStorage data to prevent stale auth
+                if (persistedState) {
+                    delete persistedState.isAdminLoggedIn
+                    delete persistedState.adminUser
+                }
+                return { ...currentState, ...persistedState }
+            }
         }
     )
 )
+
+// Hydrate admin auth from sessionStorage on startup
+try {
+    const stored = sessionStorage.getItem('fp-admin-auth')
+    if (stored) {
+        const { isAdminLoggedIn, adminUser } = JSON.parse(stored)
+        if (isAdminLoggedIn && adminUser) {
+            useStore.setState({ isAdminLoggedIn, adminUser })
+        }
+    }
+} catch (e) { /* ignore */ }
 
 // Export constants for use in other components
 export { ROLES, PERMISSIONS }

@@ -1,5 +1,5 @@
-import { Routes, Route } from 'react-router-dom'
-import { useState, useEffect } from 'react'
+import { Routes, Route, useLocation } from 'react-router-dom'
+import { useState, useEffect, useRef } from 'react'
 import Navbar from './components/Navbar'
 import Footer from './components/Footer'
 import ScrollToTop from './components/ScrollToTop'
@@ -17,6 +17,9 @@ import ProductList from './pages/admin/ProductList'
 import ProductForm from './pages/admin/ProductForm'
 import CategoryManager from './pages/admin/CategoryManager'
 import PolicyManager from './pages/admin/PolicyManager'
+import Inquiries from './pages/admin/Inquiries'
+import AuditLog from './pages/admin/AuditLog'
+import SettingsPage from './pages/admin/SettingsPage'
 
 import Policies from './pages/Policies'
 
@@ -25,6 +28,25 @@ import './App.css'
 
 function App() {
     const [loading, setLoading] = useState(true)
+    const location = useLocation()
+    const prevPathRef = useRef(location.pathname)
+
+    // Clear admin session when navigating away from /admin/* via SPA navigation
+    useEffect(() => {
+        const prevPath = prevPathRef.current
+        const currentPath = location.pathname
+        prevPathRef.current = currentPath
+
+        // If we were on an admin route and now we're NOT on an admin route
+        const wasAdmin = prevPath.startsWith('/admin') && prevPath !== '/admin/login'
+        const isAdmin = currentPath.startsWith('/admin') && currentPath !== '/admin/login'
+
+        if (wasAdmin && !isAdmin) {
+            sessionStorage.removeItem('fp-admin-active')
+            sessionStorage.removeItem('fp-admin-auth')
+            useStore.getState().logoutAdmin()
+        }
+    }, [location.pathname])
 
     useEffect(() => {
         // Fetch all data from database on initial load
@@ -73,7 +95,10 @@ function App() {
                     <Route path="products/new" element={<ProductForm />} />
                     <Route path="products/:id/edit" element={<ProductForm />} />
                     <Route path="categories" element={<CategoryManager />} />
+                    <Route path="inquiries" element={<Inquiries />} />
+                    <Route path="activity" element={<AuditLog />} />
                     <Route path="policies" element={<PolicyManager />} />
+                    <Route path="settings" element={<SettingsPage />} />
                 </Route>
             </Routes>
         </div>

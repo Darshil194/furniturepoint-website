@@ -60,7 +60,7 @@ async function logActivity(action, entityType, entityId, description, userId = '
     }
 }
 
-// Test DB Connection & Create Audit Table if missing
+// Test DB Connection & Create tables if missing
 (async () => {
     try {
         const result = await sql`SELECT NOW()`;
@@ -78,6 +78,23 @@ async function logActivity(action, entityType, entityId, description, userId = '
                 user_role VARCHAR(50),
                 description TEXT,
                 timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            )
+        `;
+
+        // Ensure inquiries table exists
+        await sql`
+            CREATE TABLE IF NOT EXISTS inquiries (
+                id SERIAL PRIMARY KEY,
+                name VARCHAR(255) NOT NULL,
+                company_name VARCHAR(255),
+                email VARCHAR(255) NOT NULL,
+                phone VARCHAR(50),
+                product_name VARCHAR(255),
+                quantity INTEGER,
+                project_location VARCHAR(255),
+                message TEXT,
+                status VARCHAR(20) DEFAULT 'pending',
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
             )
         `;
     } catch (err) {
@@ -131,6 +148,75 @@ app.get('/api/audit-logs', async (req, res) => {
     } catch (err) {
         console.error(err);
         res.status(500).json({ error: 'Failed to fetch audit logs' });
+    }
+});
+
+// =======================
+// INQUIRIES
+// =======================
+app.get('/api/inquiries', async (req, res) => {
+    try {
+        const rows = await sql`SELECT * FROM inquiries ORDER BY created_at DESC`;
+        const inquiries = rows.map(row => ({
+            id: row.id,
+            name: row.name,
+            companyName: row.company_name,
+            email: row.email,
+            phone: row.phone,
+            productName: row.product_name,
+            quantity: row.quantity,
+            projectLocation: row.project_location,
+            message: row.message,
+            status: row.status,
+            createdAt: row.created_at
+        }));
+        res.json(inquiries);
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ error: 'Failed to fetch inquiries' });
+    }
+});
+
+app.post('/api/inquiries', async (req, res) => {
+    try {
+        const { name, companyName, email, phone, productName, quantity, projectLocation, message } = req.body;
+        const result = await sql`
+            INSERT INTO inquiries (name, company_name, email, phone, product_name, quantity, project_location, message)
+            VALUES (${name}, ${companyName || null}, ${email}, ${phone || null}, ${productName || null}, ${quantity ? parseInt(quantity) : null}, ${projectLocation || null}, ${message || null})
+            RETURNING *
+        `;
+        res.status(201).json(result[0]);
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ error: 'Failed to create inquiry' });
+    }
+});
+
+app.put('/api/inquiries/:id/status', async (req, res) => {
+    try {
+        const { id } = req.params;
+        const { status } = req.body;
+        const result = await sql`
+            UPDATE inquiries SET status = ${status} WHERE id = ${id} RETURNING *
+        `;
+        if (result.length === 0) {
+            return res.status(404).json({ error: 'Inquiry not found' });
+        }
+        res.json(result[0]);
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ error: 'Failed to update inquiry status' });
+    }
+});
+
+app.delete('/api/inquiries/:id', async (req, res) => {
+    try {
+        const { id } = req.params;
+        await sql`DELETE FROM inquiries WHERE id = ${id}`;
+        res.json({ success: true });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ error: 'Failed to delete inquiry' });
     }
 });
 

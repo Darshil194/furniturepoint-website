@@ -3,124 +3,95 @@ import { MapPin, Phone, Mail, Clock, Send } from 'lucide-react'
 import './Contact.css'
 
 function Contact() {
-    const [activeTab, setActiveTab] = useState('product') // product, service, custom
+    const [formData, setFormData] = useState({
+        name: '',
+        companyName: '',
+        email: '',
+        phone: '',
+        productName: '',
+        quantity: '',
+        projectLocation: '',
+        message: ''
+    })
+    const [submitting, setSubmitting] = useState(false)
 
-    const handleSubmit = (e) => {
+    const handleChange = (e) => {
+        const { name, value } = e.target
+        setFormData(prev => ({ ...prev, [name]: value }))
+    }
+
+    const handleSubmit = async (e) => {
         e.preventDefault()
+        setSubmitting(true)
+        try {
+            await fetch('https://furniturepoint-website-k3j7.onrender.com/api/inquiries', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(formData)
+            })
+        } catch (err) {
+            console.error('Failed to submit inquiry:', err)
+        }
+        setSubmitting(false)
         alert('Thank you for your enquiry. Our B2B team will contact you within 24 hours.')
+        setFormData({
+            name: '', companyName: '', email: '', phone: '',
+            productName: '', quantity: '', projectLocation: '', message: ''
+        })
     }
 
     return (
         <div className="contact-page">
             <header className="contact-header">
                 <h1>Contact Furniture Point</h1>
-                <p>Industrial & Corporate Furniture Solutions tailored to your business needs.</p>
+                <p>Industrial &amp; Corporate Furniture Solutions tailored to your business needs.</p>
             </header>
 
             <div className="contact-container">
                 {/* Main Content: Enquiry Form */}
                 <div className="contact-main">
-                    <div className="contact-tabs">
-                        <button
-                            className={`tab-btn ${activeTab === 'product' ? 'active' : ''}`}
-                            onClick={() => setActiveTab('product')}
-                        >
-                            Product Enquiry
-                        </button>
-                        <button
-                            className={`tab-btn ${activeTab === 'service' ? 'active' : ''}`}
-                            onClick={() => setActiveTab('service')}
-                        >
-                            After-Sales Service
-                        </button>
-                        <button
-                            className={`tab-btn ${activeTab === 'custom' ? 'active' : ''}`}
-                            onClick={() => setActiveTab('custom')}
-                        >
-                            Custom Solution
-                        </button>
-                    </div>
-
                     <form className="contact-form" onSubmit={handleSubmit}>
                         {/* Common Fields */}
                         <div className="form-group">
                             <label>Full Name *</label>
-                            <input type="text" placeholder="name + surname" required />
+                            <input type="text" name="name" value={formData.name} onChange={handleChange} placeholder="name + surname" required />
                         </div>
                         <div className="form-group">
                             <label>Company Name *</label>
-                            <input type="text" placeholder="XYZ Industries Ltd." required />
+                            <input type="text" name="companyName" value={formData.companyName} onChange={handleChange} placeholder="XYZ Industries Ltd." required />
                         </div>
                         <div className="form-group">
                             <label>Business Email *</label>
-                            <input type="email" placeholder="business email" required />
+                            <input type="email" name="email" value={formData.email} onChange={handleChange} placeholder="business email" required />
                         </div>
                         <div className="form-group">
                             <label>Phone Number *</label>
-                            <input type="tel" placeholder="+91 xxxxx xxxxx" required />
+                            <input type="tel" name="phone" value={formData.phone} onChange={handleChange} placeholder="+91 xxxxx xxxxx" required />
                         </div>
 
-                        {/* Conditional Fields: Product Enquiry */}
-                        {activeTab === 'product' && (
-                            <>
-                                <div className="form-group">
-                                    <label>Product Name / Model</label>
-                                    <input type="text" placeholder="e.g. Industrial Workbench Type-A" />
-                                </div>
-                                <div className="form-group">
-                                    <label>Quantity Required</label>
-                                    <input type="number" placeholder="e.g. 10" min="1" />
-                                </div>
-                                <div className="form-group full-width">
-                                    <label>Project Location / Delivery Site</label>
-                                    <input type="text" placeholder="e.g. Dholera, Unit 2" />
-                                </div>
-                            </>
-                        )}
-
-                        {/* Conditional Fields: After Sales */}
-                        {activeTab === 'service' && (
-                            <>
-                                <div className="form-group">
-                                    <label>Order ID / Invoice Number</label>
-                                    <input type="text" placeholder="e.g. INV-2023-001" />
-                                </div>
-                                <div className="form-group">
-                                    <label>Issue Type</label>
-                                    <select>
-                                        <option>Select Issue</option>
-                                        <option>Installation Support</option>
-                                        <option>Warranty Claim</option>
-                                        <option>Maintenance Request</option>
-                                        <option>Other</option>
-                                    </select>
-                                </div>
-                            </>
-                        )}
-
-                        {/* Conditional Fields: Custom Solution */}
-                        {activeTab === 'custom' && (
-                            <div className="form-group full-width">
-                                <label>Requirement Type</label>
-                                <select>
-                                    <option>Select Requirement</option>
-                                    <option>Full Office Fitout</option>
-                                    <option>Laboratory Setup</option>
-                                    <option>Warehouse Racking System</option>
-                                    <option>Custom Metal Fabrication</option>
-                                </select>
-                            </div>
-                        )}
+                        {/* Product Enquiry Fields */}
+                        <div className="form-group">
+                            <label>Product Name / Model</label>
+                            <input type="text" name="productName" value={formData.productName} onChange={handleChange} placeholder="e.g. Industrial Workbench Type-A" />
+                        </div>
+                        <div className="form-group">
+                            <label>Quantity Required</label>
+                            <input type="number" name="quantity" value={formData.quantity} onChange={handleChange} placeholder="e.g. 10" min="1" />
+                        </div>
+                        <div className="form-group full-width">
+                            <label>Project Location / Delivery Site</label>
+                            <input type="text" name="projectLocation" value={formData.projectLocation} onChange={handleChange} placeholder="e.g. Dholera, Unit 2" />
+                        </div>
 
                         <div className="form-group full-width">
                             <label>Message / Specific Requirements</label>
-                            <textarea rows="4" placeholder="Describe your requirements..."></textarea>
+                            <textarea rows="4" name="message" value={formData.message} onChange={handleChange} placeholder="Describe your requirements..."></textarea>
                         </div>
 
                         <div className="form-group full-width">
-                            <button type="submit" className="submit-btn">
+                            <button type="submit" className="submit-btn" disabled={submitting}>
                                 <Send size={18} style={{ display: 'inline', marginRight: '8px' }} />
-                                Send Enquiry
+                                {submitting ? 'Sending...' : 'Send Enquiry'}
                             </button>
                         </div>
                     </form>
