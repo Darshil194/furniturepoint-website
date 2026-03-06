@@ -293,21 +293,21 @@ function TestimonialsSection() {
                         <p>"Furniture Point equipped our entire QC lab in Ankleshwar. Their workbenches are extremely durable and the installation was finished 2 days ahead of schedule."</p>
                         <div className="client-info">
                             <h5>Rajesh Patel</h5>
-                            <span>Plant Head, Apex Chemical Industries</span>
+                            <span></span>
                         </div>
                     </div>
                     <div className="b2b-testimonial">
                         <p>"We needed a custom modular layout for our new corporate office. Their design team optimized our space perfectly. Professional service from start to finish."</p>
                         <div className="client-info">
                             <h5>Amit Shah</h5>
-                            <span>Director, TechSol Pvt Ltd</span>
+                            <span></span>
                         </div>
                     </div>
                     <div className="b2b-testimonial">
                         <p>"The metal storage lockers and heavy-duty racks supplied for our warehouse are high quality. Best B2B furniture vendor in Gujarat."</p>
                         <div className="client-info">
                             <h5>Vikram Singh</h5>
-                            <span>Operations Manager, GIDC Logistics</span>
+                            <span></span>
                         </div>
                     </div>
                 </div>
