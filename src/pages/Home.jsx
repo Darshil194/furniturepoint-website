@@ -228,17 +228,13 @@ function CategoriesSection() {
                     <p>Specialized furniture systems for factories, offices, and laboratories.</p>
                 </header>
 
-                <div className="categories__grid">
+                <div className="home-categories__grid">
                     {categories.map((cat, index) => (
-                        <Link to={cat.link} key={index} className="category-card">
-                            <div className="category-card__image">
+                        <Link to={cat.link} key={index} className="home-category-card">
+                            <div className="home-category-card__image">
                                 <img src={cat.image} alt={cat.name} />
-                            </div>
-                            <div className="category-card__content">
-                                <h3>{cat.name}</h3>
-                                <span className="category-card__link">
-                                    View Specs <ArrowRight size={16} />
-                                </span>
+                                <div className="home-category-card__overlay"></div>
+                                <h3 className="home-category-card__title">{cat.name}</h3>
                             </div>
                         </Link>
                     ))}

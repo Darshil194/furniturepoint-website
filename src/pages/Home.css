@@ -462,66 +462,64 @@
 }
 
 /* Categories - Industrial Sectors */
-.categories__grid {
+.home-categories__grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
     gap: var(--space-lg);
 }
 
-.category-card {
+.home-category-card {
     position: relative;
     height: 350px;
     overflow: hidden;
     text-decoration: none;
     border-radius: var(--radius-xl);
-    border-bottom: none;
     box-shadow: var(--shadow-md);
+    transition: transform 0.4s ease, box-shadow 0.4s ease;
 }
 
-.category-card__image {
+.home-category-card:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 16px 40px rgba(0, 0, 0, 0.18);
+}
+
+.home-category-card__image {
     position: absolute;
     inset: 0;
 }
 
-.category-card__image img {
+.home-category-card__image img {
     width: 100%;
     height: 100%;
     object-fit: cover;
     transition: transform 0.6s ease;
-    filter: brightness(0.85);
 }
 
-.category-card:hover .category-card__image img {
+.home-category-card:hover .home-category-card__image img {
     transform: scale(1.05);
-    filter: brightness(0.7);
 }
 
-.category-card__content {
+.home-category-card__overlay {
     position: absolute;
     inset: 0;
-    display: flex;
-    flex-direction: column;
-    justify-content: flex-end;
-    padding: var(--space-xl);
-    z-index: 2;
+    background: linear-gradient(to top, rgba(0, 0, 0, 0.6), transparent);
+    z-index: 1;
+    pointer-events: none;
 }
 
-.category-card__content h3 {
-    color: var(--color-white);
-    font-size: 1.5rem;
+.home-category-card__title {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    padding: var(--space-lg) var(--space-xl);
+    color: #fff;
+    font-size: 1.4rem;
     font-weight: 700;
-    margin-bottom: var(--space-xs);
-    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
-}
-
-.category-card__link {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.5rem;
-    color: var(--color-white);
-    font-weight: 600;
-    font-size: 0.9rem;
-    text-transform: uppercase;
+    text-shadow: 0 2px 6px rgba(0, 0, 0, 0.5);
+    z-index: 2;
+    margin: 0;
+    line-height: 1.3;
 }
 
 /* Product Spotlight - Spec Cards */
