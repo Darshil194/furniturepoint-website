@@ -213,7 +213,7 @@ function FeaturesBar() {
 
 function CategoriesSection() {
     const categories = [
-        { name: 'Industrial Storage Solutions', image: 'https://images.unsplash.com/photo-1618090584126-729cd31347b3?auto=format&fit=crop&q=80', link: '/catalog?category=industrial' },
+        { name: 'Industrial Storage Solutions', image: 'assets/banner/compactor.png', link: '/catalog?category=industrial' },
         { name: 'Corporate Workstations', image: 'https://images.unsplash.com/photo-1765366417030-16d9765d920a?q=80&w=1172&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D', link: '/catalog?category=office' },
         { name: 'Lab & Testing Furniture', image: 'https://images.unsplash.com/photo-1581093450021-4a7360e9a6b5?auto=format&fit=crop&q=80', link: '/catalog?category=lab' },
         { name: 'Industrial Storage', image: 'https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?auto=format&fit=crop&q=80', link: '/catalog?category=storage' }
