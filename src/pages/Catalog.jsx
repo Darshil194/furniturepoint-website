@@ -77,7 +77,7 @@ function Catalog() {
 
     return (
         <div className="catalog">
-            {/* Hero Banner */}
+            {/* Hero Banner - Commented out for cleaner catalog layout
             <motion.div
                 className="catalog__hero"
                 initial={{ opacity: 0 }}
@@ -101,6 +101,7 @@ function Catalog() {
                     </motion.p>
                 </div>
             </motion.div>
+            */}
 
             {/* Toolbar */}
             <div className={`catalog__toolbar ${!toolbarVisible ? 'catalog__toolbar--hidden' : ''}`}>

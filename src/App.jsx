@@ -1,10 +1,10 @@
-import { Routes, Route, useLocation } from 'react-router-dom'
+import { Routes, Route, useLocation, Navigate } from 'react-router-dom'
 import { useState, useEffect, useRef } from 'react'
 import Navbar from './components/Navbar'
 import Footer from './components/Footer'
 import ScrollToTop from './components/ScrollToTop'
 import Home from './pages/Home'
-import Catalog from './pages/Catalog'
+import FurniturePage from './pages/FurniturePage'
 import About from './pages/About'
 import Contact from './pages/Contact'
 import AdminLogin from './pages/AdminLogin'
@@ -74,7 +74,10 @@ function App() {
             <Routes>
                 {/* Public Routes */}
                 <Route path="/" element={<PublicLayout><Home /></PublicLayout>} />
-                <Route path="/catalog" element={<PublicLayout><Catalog /></PublicLayout>} />
+                <Route path="/furniture" element={<PublicLayout><FurniturePage /></PublicLayout>} />
+                <Route path="/furniture/:categorySlug" element={<PublicLayout><FurniturePage /></PublicLayout>} />
+                <Route path="/furniture/:categorySlug/:subSlug" element={<PublicLayout><FurniturePage /></PublicLayout>} />
+                <Route path="/catalog" element={<Navigate to="/furniture" replace />} />
                 <Route path="/about" element={<PublicLayout><About /></PublicLayout>} />
                 <Route path="/contact" element={<PublicLayout><Contact /></PublicLayout>} />
                 <Route path="/policies/:type?" element={<PublicLayout><Policies /></PublicLayout>} />

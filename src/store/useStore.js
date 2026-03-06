@@ -6,25 +6,25 @@ import { persist, createJSONStorage } from 'zustand/middleware'
 // ============================================
 
 const initialCategories = [
-    { id: 1, name: 'Living Room', description: 'Furniture for living spaces' },
-    { id: 2, name: 'Dining Room', description: 'Dining tables and chairs' },
-    { id: 3, name: 'Bedroom', description: 'Beds, dressers, and nightstands' },
-    { id: 4, name: 'Office', description: 'Home office furniture' },
-    { id: 5, name: 'Storage', description: 'Shelves, cabinets, and organizers' }
+    { id: 1, name: 'Living Room', slug: 'living-room', description: 'Furniture for living spaces', imageUrl: '' },
+    { id: 2, name: 'Dining Room', slug: 'dining-room', description: 'Dining tables and chairs', imageUrl: '' },
+    { id: 3, name: 'Bedroom', slug: 'bedroom', description: 'Beds, dressers, and nightstands', imageUrl: '' },
+    { id: 4, name: 'Office', slug: 'office', description: 'Home office furniture', imageUrl: '' },
+    { id: 5, name: 'Storage', slug: 'storage', description: 'Shelves, cabinets, and organizers', imageUrl: '' }
 ]
 
 const initialSubcategories = [
-    { id: 1, categoryId: 1, name: 'Sofas', description: 'Couches and loveseats' },
-    { id: 2, categoryId: 1, name: 'Chairs', description: 'Accent and armchairs' },
-    { id: 3, categoryId: 1, name: 'Coffee Tables', description: 'Center tables' },
-    { id: 4, categoryId: 2, name: 'Dining Tables', description: 'Eating tables' },
-    { id: 5, categoryId: 2, name: 'Dining Chairs', description: 'Seating for dining' },
-    { id: 6, categoryId: 3, name: 'Beds', description: 'Bed frames and platforms' },
-    { id: 7, categoryId: 3, name: 'Dressers', description: 'Clothing storage' },
-    { id: 8, categoryId: 4, name: 'Desks', description: 'Work surfaces' },
-    { id: 9, categoryId: 4, name: 'Office Chairs', description: 'Ergonomic seating' },
-    { id: 10, categoryId: 5, name: 'Bookshelves', description: 'Book storage' },
-    { id: 11, categoryId: 5, name: 'Cabinets', description: 'Enclosed storage' }
+    { id: 1, categoryId: 1, name: 'Sofas', slug: 'sofas', description: 'Couches and loveseats', imageUrl: '' },
+    { id: 2, categoryId: 1, name: 'Chairs', slug: 'chairs', description: 'Accent and armchairs', imageUrl: '' },
+    { id: 3, categoryId: 1, name: 'Coffee Tables', slug: 'coffee-tables', description: 'Center tables', imageUrl: '' },
+    { id: 4, categoryId: 2, name: 'Dining Tables', slug: 'dining-tables', description: 'Eating tables', imageUrl: '' },
+    { id: 5, categoryId: 2, name: 'Dining Chairs', slug: 'dining-chairs', description: 'Seating for dining', imageUrl: '' },
+    { id: 6, categoryId: 3, name: 'Beds', slug: 'beds', description: 'Bed frames and platforms', imageUrl: '' },
+    { id: 7, categoryId: 3, name: 'Dressers', slug: 'dressers', description: 'Clothing storage', imageUrl: '' },
+    { id: 8, categoryId: 4, name: 'Desks', slug: 'desks', description: 'Work surfaces', imageUrl: '' },
+    { id: 9, categoryId: 4, name: 'Office Chairs', slug: 'office-chairs', description: 'Ergonomic seating', imageUrl: '' },
+    { id: 10, categoryId: 5, name: 'Bookshelves', slug: 'bookshelves', description: 'Book storage', imageUrl: '' },
+    { id: 11, categoryId: 5, name: 'Cabinets', slug: 'cabinets', description: 'Enclosed storage', imageUrl: '' }
 ]
 
 const initialMaterials = [

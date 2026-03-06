@@ -38,7 +38,31 @@ const storage = multer.diskStorage({
     }
 });
 
-const upload = multer({ storage: storage });
+// Multer file filter - only allow jpg, png, webp
+const fileFilter = (req, file, cb) => {
+    const allowedTypes = ['image/jpeg', 'image/png', 'image/webp'];
+    if (allowedTypes.includes(file.mimetype)) {
+        cb(null, true);
+    } else {
+        cb(new Error('Invalid file type. Only JPG, PNG, and WebP are allowed.'), false);
+    }
+};
+
+const upload = multer({
+    storage: storage,
+    fileFilter: fileFilter,
+    limits: { fileSize: 3 * 1024 * 1024 } // 3MB max
+});
+
+// Slug generator helper
+function generateSlug(name) {
+    return name
+        .toLowerCase()
+        .trim()
+        .replace(/[^\w\s-]/g, '')
+        .replace(/[\s_]+/g, '-')
+        .replace(/-+/g, '-');
+}
 
 // Database Connection
 const sql = neon(process.env.DATABASE_URL);
@@ -226,7 +250,14 @@ app.delete('/api/inquiries/:id', async (req, res) => {
 app.get('/api/categories', async (req, res) => {
     try {
         const rows = await sql`SELECT * FROM categories ORDER BY id`;
-        res.json(rows);
+        const categories = rows.map(row => ({
+            id: row.id,
+            name: row.name,
+            slug: row.slug || '',
+            description: row.description,
+            imageUrl: row.image_url || ''
+        }));
+        res.json(categories);
     } catch (err) {
         console.error(err);
         res.status(500).json({ error: 'Internal Server Error' });
@@ -235,15 +266,22 @@ app.get('/api/categories', async (req, res) => {
 
 app.post('/api/categories', async (req, res) => {
     try {
-        const { name, description } = req.body;
+        const { name, description, imageUrl } = req.body;
+        const slug = generateSlug(name);
         const result = await sql`
-            INSERT INTO categories (name, description)
-            VALUES (${name}, ${description})
+            INSERT INTO categories (name, slug, description, image_url)
+            VALUES (${name}, ${slug}, ${description}, ${imageUrl || null})
             RETURNING *
         `;
         const newCat = result[0];
         await logActivity('create', 'category', newCat.id, `Created category: ${newCat.name}`);
-        res.status(201).json(newCat);
+        res.status(201).json({
+            id: newCat.id,
+            name: newCat.name,
+            slug: newCat.slug || '',
+            description: newCat.description,
+            imageUrl: newCat.image_url || ''
+        });
     } catch (err) {
         console.error(err);
         res.status(500).json({ error: err.message });
@@ -253,10 +291,11 @@ app.post('/api/categories', async (req, res) => {
 app.put('/api/categories/:id', async (req, res) => {
     try {
         const { id } = req.params;
-        const { name, description } = req.body;
+        const { name, description, imageUrl } = req.body;
+        const slug = generateSlug(name);
         const result = await sql`
             UPDATE categories 
-            SET name = ${name}, description = ${description}
+            SET name = ${name}, slug = ${slug}, description = ${description}, image_url = ${imageUrl || null}
             WHERE id = ${id}
             RETURNING *
         `;
@@ -264,7 +303,13 @@ app.put('/api/categories/:id', async (req, res) => {
             return res.status(404).json({ error: 'Category not found' });
         }
         await logActivity('update', 'category', id, `Updated category: ${name}`);
-        res.json(result[0]);
+        res.json({
+            id: result[0].id,
+            name: result[0].name,
+            slug: result[0].slug || '',
+            description: result[0].description,
+            imageUrl: result[0].image_url || ''
+        });
     } catch (err) {
         console.error(err);
         res.status(500).json({ error: err.message });
@@ -294,7 +339,9 @@ app.get('/api/subcategories', async (req, res) => {
             id: row.id,
             categoryId: row.category_id,
             name: row.name,
-            description: row.description
+            slug: row.slug || '',
+            description: row.description,
+            imageUrl: row.image_url || ''
         }));
         res.json(subcategories);
     } catch (err) {
@@ -305,10 +352,11 @@ app.get('/api/subcategories', async (req, res) => {
 
 app.post('/api/subcategories', async (req, res) => {
     try {
-        const { categoryId, name, description } = req.body;
+        const { categoryId, name, description, imageUrl } = req.body;
+        const slug = generateSlug(name);
         const result = await sql`
-            INSERT INTO subcategories (category_id, name, description)
-            VALUES (${categoryId}, ${name}, ${description || ''})
+            INSERT INTO subcategories (category_id, name, slug, description, image_url)
+            VALUES (${categoryId}, ${name}, ${slug}, ${description || ''}, ${imageUrl || null})
             RETURNING *
         `;
         const newSub = result[0];
@@ -317,7 +365,9 @@ app.post('/api/subcategories', async (req, res) => {
             id: newSub.id,
             categoryId: newSub.category_id,
             name: newSub.name,
-            description: newSub.description
+            slug: newSub.slug || '',
+            description: newSub.description,
+            imageUrl: newSub.image_url || ''
         });
     } catch (err) {
         console.error(err);
@@ -328,10 +378,11 @@ app.post('/api/subcategories', async (req, res) => {
 app.put('/api/subcategories/:id', async (req, res) => {
     try {
         const { id } = req.params;
-        const { categoryId, name, description } = req.body;
+        const { categoryId, name, description, imageUrl } = req.body;
+        const slug = generateSlug(name);
         const result = await sql`
             UPDATE subcategories 
-            SET category_id = ${categoryId}, name = ${name}, description = ${description || ''}
+            SET category_id = ${categoryId}, name = ${name}, slug = ${slug}, description = ${description || ''}, image_url = ${imageUrl || null}
             WHERE id = ${id}
             RETURNING *
         `;
@@ -343,7 +394,9 @@ app.put('/api/subcategories/:id', async (req, res) => {
             id: result[0].id,
             categoryId: result[0].category_id,
             name: result[0].name,
-            description: result[0].description
+            slug: result[0].slug || '',
+            description: result[0].description,
+            imageUrl: result[0].image_url || ''
         });
     } catch (err) {
         console.error(err);

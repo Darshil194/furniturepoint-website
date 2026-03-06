@@ -66,7 +66,7 @@ function Navbar() {
     // Home has NO dropdown
     const navItems = [
         { key: 'home', label: 'Home', path: '/', hasDropdown: false },
-        { key: 'catalog', label: 'Catalog', path: '/catalog', hasDropdown: false },
+        { key: 'catalog', label: 'Catalog', path: '/furniture', hasDropdown: false },
         { key: 'about', label: 'About', path: '/about', hasDropdown: false },
         { key: 'contact', label: 'Contact', path: '/contact', hasDropdown: false },
         { key: 'policies', label: 'Policies', path: '/policies', hasDropdown: true }
@@ -203,8 +203,8 @@ function Navbar() {
                                     key={item.key}
                                     to={item.path}
                                     className={`mobile-drawer__link ${location.pathname === item.path ||
-                                            (item.path !== '/' && location.pathname.startsWith(item.path))
-                                            ? 'active' : ''
+                                        (item.path !== '/' && location.pathname.startsWith(item.path))
+                                        ? 'active' : ''
                                         }`}
                                     onClick={() => {
                                         setIsMobileMenuOpen(false)

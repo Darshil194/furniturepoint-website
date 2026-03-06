@@ -1,5 +1,6 @@
 /* Catalog Page Styles - Light Theme */
 
+/* Hero Banner - Commented out
 .catalog__hero {
     background: linear-gradient(180deg, var(--color-cream) 0%, var(--color-ivory) 100%);
     padding: calc(var(--space-5xl) + 80px) 0 var(--space-4xl);
@@ -15,14 +16,16 @@
     color: var(--color-taupe);
     font-size: 1.2rem;
 }
+*/
 
 /* Toolbar */
 .catalog__toolbar {
     background: var(--color-white);
     border-bottom: 1px solid var(--color-sand);
     padding: var(--space-lg) 0;
+    padding-top: calc(var(--space-lg) + 80px);
     position: sticky;
-    top: 70px;
+    top: 0;
     z-index: 100;
     transition: transform 0.3s ease, opacity 0.3s ease;
 }
@@ -54,22 +57,33 @@
     display: flex;
     align-items: center;
     gap: var(--space-sm);
-    padding: var(--space-sm) var(--space-lg);
+    padding: 10px 20px;
     background: var(--color-ivory);
-    border-radius: var(--radius-full);
-    border: 1px solid transparent;
-    transition: all var(--transition-fast);
+    border-radius: 25px;
+    border: 1.5px solid var(--color-sand);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+    transition: all 0.3s ease;
+}
+
+.toolbar__search:hover {
+    border-color: var(--color-taupe);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
 }
 
 .toolbar__search:focus-within {
     background: var(--color-white);
     border-color: var(--color-primary);
-    box-shadow: 0 0 0 3px rgba(26, 26, 46, 0.06);
+    box-shadow: 0 4px 20px rgba(26, 26, 46, 0.12);
 }
 
 .toolbar__search svg {
     color: var(--color-taupe);
     flex-shrink: 0;
+    transition: color 0.3s ease;
+}
+
+.toolbar__search:focus-within svg {
+    color: var(--color-primary);
 }
 
 .toolbar__search input {
@@ -77,12 +91,27 @@
     background: none;
     outline: none;
     font-size: 0.95rem;
-    width: 200px;
+    width: 220px;
+    color: var(--color-charcoal);
+}
+
+.toolbar__search input::placeholder {
+    color: var(--color-taupe);
+    transition: color 0.3s ease;
+}
+
+.toolbar__search:focus-within input::placeholder {
+    color: var(--color-sand);
 }
 
 .toolbar__search button {
     color: var(--color-taupe);
     display: flex;
+    transition: color 0.2s ease;
+}
+
+.toolbar__search button:hover {
+    color: var(--color-charcoal);
 }
 
 .toolbar__right {
@@ -260,6 +289,12 @@
 /* Products Grid */
 .catalog__products {
     min-height: 500px;
+}
+
+.products-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: var(--space-xl);
 }
 
 .products-grid--list {

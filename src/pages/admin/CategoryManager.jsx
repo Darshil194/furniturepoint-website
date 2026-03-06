@@ -1,7 +1,9 @@
-import { useState } from 'react';
-import { Plus, Edit, Trash2, FolderTree, ChevronRight } from 'lucide-react';
+import { useState, useRef } from 'react';
+import { Plus, Edit, Trash2, FolderTree, ChevronRight, Upload, X, Image } from 'lucide-react';
 import useStore from '../../store/useStore';
 import EditableSelect from '../../components/common/EditableSelect';
+
+const API_BASE_URL = 'https://furniturepoint-website.onrender.com';
 
 const CategoryManager = () => {
     const {
@@ -18,10 +20,56 @@ const CategoryManager = () => {
 
     const [editingCategory, setEditingCategory] = useState(null);
     const [editingSubcategory, setEditingSubcategory] = useState(null);
-    const [newCategory, setNewCategory] = useState({ name: '', description: '' });
-    const [newSubcategory, setNewSubcategory] = useState({ categoryId: '', name: '', description: '' });
+    const [newCategory, setNewCategory] = useState({ name: '', description: '', imageUrl: '' });
+    const [newSubcategory, setNewSubcategory] = useState({ categoryId: '', name: '', description: '', imageUrl: '' });
     const [showAddCategory, setShowAddCategory] = useState(false);
     const [showAddSubcategory, setShowAddSubcategory] = useState(false);
+    const [uploading, setUploading] = useState(false);
+
+    const catImageRef = useRef(null);
+    const subImageRef = useRef(null);
+
+    // Upload image helper
+    const handleImageUpload = async (file, setStateFn, stateObj) => {
+        if (!file) return;
+
+        // Validate file type
+        const allowedTypes = ['image/jpeg', 'image/png', 'image/webp'];
+        if (!allowedTypes.includes(file.type)) {
+            alert('Invalid file type. Only JPG, PNG, and WebP are allowed.');
+            return;
+        }
+
+        // Validate file size (3MB)
+        if (file.size > 3 * 1024 * 1024) {
+            alert('File too large. Maximum size is 3MB.');
+            return;
+        }
+
+        setUploading(true);
+        try {
+            const formData = new FormData();
+            formData.append('image', file);
+
+            const response = await fetch(`${API_BASE_URL}/api/upload`, {
+                method: 'POST',
+                body: formData
+            });
+
+            if (response.ok) {
+                const data = await response.json();
+                // Store only the relative path
+                setStateFn({ ...stateObj, imageUrl: data.url });
+            } else {
+                alert('Failed to upload image.');
+            }
+        } catch (error) {
+            console.error('Upload error:', error);
+            alert('Failed to upload image.');
+        } finally {
+            setUploading(false);
+        }
+    };
 
     // Get product count for category
     const getCategoryProductCount = (categoryId) => {
@@ -42,7 +90,7 @@ const CategoryManager = () => {
     const handleAddCategory = () => {
         if (newCategory.name.trim()) {
             addCategory(newCategory);
-            setNewCategory({ name: '', description: '' });
+            setNewCategory({ name: '', description: '', imageUrl: '' });
             setShowAddCategory(false);
         }
     };
@@ -54,7 +102,7 @@ const CategoryManager = () => {
                 ...newSubcategory,
                 categoryId: parseInt(newSubcategory.categoryId)
             });
-            setNewSubcategory({ categoryId: '', name: '', description: '' });
+            setNewSubcategory({ categoryId: '', name: '', description: '', imageUrl: '' });
             setShowAddSubcategory(false);
         }
     };
@@ -92,6 +140,58 @@ const CategoryManager = () => {
             deleteSubcategory(subcategoryId);
         }
     };
+
+    // Image preview component
+    const ImagePreview = ({ imageUrl, onRemove, size = 60 }) => {
+        if (!imageUrl) return null;
+        const fullUrl = imageUrl.startsWith('http') ? imageUrl : `${API_BASE_URL}${imageUrl}`;
+        return (
+            <div style={{
+                position: 'relative',
+                width: size,
+                height: size,
+                borderRadius: '8px',
+                overflow: 'hidden',
+                border: '1px solid rgba(255,255,255,0.1)',
+                flexShrink: 0
+            }}>
+                <img
+                    src={fullUrl}
+                    alt="Preview"
+                    style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                    onError={(e) => { e.target.src = '/images/category-placeholder.jpg'; }}
+                />
+                {onRemove && (
+                    <button
+                        onClick={onRemove}
+                        style={{
+                            position: 'absolute', top: 2, right: 2,
+                            background: 'rgba(0,0,0,0.6)', border: 'none',
+                            borderRadius: '50%', width: 20, height: 20,
+                            display: 'flex', alignItems: 'center', justifyContent: 'center',
+                            cursor: 'pointer', color: '#fff', padding: 0
+                        }}
+                    >
+                        <X size={12} />
+                    </button>
+                )}
+            </div>
+        );
+    };
+
+    // Upload button component
+    const UploadButton = ({ inputRef, onUpload, uploading: isUploading }) => (
+        <button
+            type="button"
+            className="btn btn-secondary"
+            onClick={() => inputRef.current?.click()}
+            disabled={isUploading}
+            style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', fontSize: '0.85rem', padding: '0.5rem 0.8rem' }}
+        >
+            <Upload size={14} />
+            {isUploading ? 'Uploading...' : 'Image'}
+        </button>
+    );
 
     return (
         <div className="category-manager">
@@ -142,6 +242,22 @@ const CategoryManager = () => {
                                 placeholder="Description (optional)"
                             />
                         </div>
+                        <input
+                            type="file"
+                            ref={catImageRef}
+                            accept=".jpg,.jpeg,.png,.webp"
+                            style={{ display: 'none' }}
+                            onChange={(e) => handleImageUpload(e.target.files[0], setNewCategory, newCategory)}
+                        />
+                        {newCategory.imageUrl ? (
+                            <ImagePreview
+                                imageUrl={newCategory.imageUrl}
+                                onRemove={() => setNewCategory({ ...newCategory, imageUrl: '' })}
+                                size={40}
+                            />
+                        ) : (
+                            <UploadButton inputRef={catImageRef} uploading={uploading} />
+                        )}
                         <button className="btn btn-primary" onClick={handleAddCategory}>
                             Add
                         </button>
@@ -186,6 +302,22 @@ const CategoryManager = () => {
                                 placeholder="Description (optional)"
                             />
                         </div>
+                        <input
+                            type="file"
+                            ref={subImageRef}
+                            accept=".jpg,.jpeg,.png,.webp"
+                            style={{ display: 'none' }}
+                            onChange={(e) => handleImageUpload(e.target.files[0], setNewSubcategory, newSubcategory)}
+                        />
+                        {newSubcategory.imageUrl ? (
+                            <ImagePreview
+                                imageUrl={newSubcategory.imageUrl}
+                                onRemove={() => setNewSubcategory({ ...newSubcategory, imageUrl: '' })}
+                                size={40}
+                            />
+                        ) : (
+                            <UploadButton inputRef={subImageRef} uploading={uploading} onUpload={() => { }} />
+                        )}
                         <button className="btn btn-primary" onClick={handleAddSubcategory}>
                             Add
                         </button>
@@ -223,7 +355,25 @@ const CategoryManager = () => {
                                     borderRadius: '10px',
                                     marginBottom: '0.5rem'
                                 }}>
-                                    <FolderTree size={20} style={{ color: 'var(--accent)', marginRight: '1rem' }} />
+                                    {/* Category Image Thumbnail */}
+                                    {category.imageUrl ? (
+                                        <div style={{
+                                            width: 36, height: 36, borderRadius: '6px',
+                                            overflow: 'hidden', marginRight: '0.75rem', flexShrink: 0,
+                                            border: '1px solid rgba(255,255,255,0.1)'
+                                        }}>
+                                            <img
+                                                src={category.imageUrl.startsWith('http') ? category.imageUrl : `${API_BASE_URL}${category.imageUrl}`}
+                                                alt={category.name}
+                                                style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                                                onError={(e) => { e.target.src = '/images/category-placeholder.jpg'; }}
+                                            />
+                                        </div>
+                                    ) : (
+                                        <Image size={20} style={{ color: 'var(--text-muted)', marginRight: '0.75rem', opacity: 0.4 }} />
+                                    )}
+
+                                    <FolderTree size={20} style={{ color: 'var(--accent)', marginRight: '0.75rem' }} />
 
                                     {editingCategory === category.id ? (
                                         <input
@@ -293,6 +443,22 @@ const CategoryManager = () => {
                                         marginBottom: '0.25rem',
                                         borderLeft: '2px solid rgba(212, 175, 55, 0.3)'
                                     }}>
+                                        {/* Subcategory Image Thumbnail */}
+                                        {sub.imageUrl ? (
+                                            <div style={{
+                                                width: 28, height: 28, borderRadius: '4px',
+                                                overflow: 'hidden', marginRight: '0.5rem', flexShrink: 0,
+                                                border: '1px solid rgba(255,255,255,0.1)'
+                                            }}>
+                                                <img
+                                                    src={sub.imageUrl.startsWith('http') ? sub.imageUrl : `${API_BASE_URL}${sub.imageUrl}`}
+                                                    alt={sub.name}
+                                                    style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                                                    onError={(e) => { e.target.src = '/images/category-placeholder.jpg'; }}
+                                                />
+                                            </div>
+                                        ) : null}
+
                                         <ChevronRight size={16} style={{ color: 'var(--text-muted)', marginRight: '0.5rem' }} />
 
                                         {editingSubcategory === sub.id ? (

@@ -27,7 +27,36 @@ async function updateSchema() {
         `;
         console.log('Added missing columns to products table.');
 
-        // 2. Create tables for materials, colors, styles if they don't exist
+        // 2. Add image_url and slug columns to categories
+        await sql`
+            ALTER TABLE categories
+            ADD COLUMN IF NOT EXISTS image_url TEXT,
+            ADD COLUMN IF NOT EXISTS slug VARCHAR(255);
+        `;
+        console.log('Added image_url and slug columns to categories table.');
+
+        // 3. Add image_url and slug columns to subcategories
+        await sql`
+            ALTER TABLE subcategories
+            ADD COLUMN IF NOT EXISTS image_url TEXT,
+            ADD COLUMN IF NOT EXISTS slug VARCHAR(255);
+        `;
+        console.log('Added image_url and slug columns to subcategories table.');
+
+        // 4. Auto-generate slugs for existing categories/subcategories that don't have one
+        await sql`
+            UPDATE categories
+            SET slug = LOWER(REGEXP_REPLACE(REGEXP_REPLACE(name, '[^\w\s-]', '', 'g'), '\s+', '-', 'g'))
+            WHERE slug IS NULL OR slug = '';
+        `;
+        await sql`
+            UPDATE subcategories
+            SET slug = LOWER(REGEXP_REPLACE(REGEXP_REPLACE(name, '[^\w\s-]', '', 'g'), '\s+', '-', 'g'))
+            WHERE slug IS NULL OR slug = '';
+        `;
+        console.log('Auto-generated slugs for existing categories/subcategories.');
+
+        // 5. Create tables for materials, colors, styles if they don't exist
         // (Assuming they might be needed for FKs, but for now we just add columns to store IDs.
         // If frontend expects these tables, we should create them to store reference data)
 
