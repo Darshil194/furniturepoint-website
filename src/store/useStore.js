@@ -439,9 +439,9 @@ const useStore = create(
             fetchAuxiliaryData: async () => {
                 try {
                     const [mRes, cRes, sRes] = await Promise.all([
-                        fetch('https://furniturepoint-website-k3j7.onrender.com/api/materials'),
-                        fetch('https://furniturepoint-website-k3j7.onrender.com/api/colors'),
-                        fetch('https://furniturepoint-website-k3j7.onrender.com/api/styles')
+                        fetch('https://furniturepoint-website.onrender.com/api/materials'),
+                        fetch('https://furniturepoint-website.onrender.com/api/colors'),
+                        fetch('https://furniturepoint-website.onrender.com/api/styles')
                     ])
                     if (mRes.ok) set({ materials: await mRes.json() })
                     if (cRes.ok) set({ colors: await cRes.json() })
@@ -453,7 +453,7 @@ const useStore = create(
 
             fetchPolicies: async () => {
                 try {
-                    const response = await fetch('https://furniturepoint-website-k3j7.onrender.com/api/policies')
+                    const response = await fetch('https://furniturepoint-website.onrender.com/api/policies')
                     if (response.ok) {
                         const data = await response.json()
                         set({ policies: data })
@@ -466,7 +466,7 @@ const useStore = create(
             updatePolicy: async (type, content) => {
                 try {
                     const policy = get().policies[type]
-                    const response = await fetch(`https://furniturepoint-website-k3j7.onrender.com/api/policies/${type}`, {
+                    const response = await fetch(`https://furniturepoint-website.onrender.com/api/policies/${type}`, {
                         method: 'PUT',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({ title: policy?.title || type, content })
@@ -504,7 +504,7 @@ const useStore = create(
             // Product CRUD
             fetchProducts: async () => {
                 try {
-                    const response = await fetch('https://furniturepoint-website-k3j7.onrender.com/api/products')
+                    const response = await fetch('https://furniturepoint-website.onrender.com/api/products')
                     if (response.ok) {
                         const data = await response.json()
                         set({ products: data })
@@ -516,7 +516,7 @@ const useStore = create(
 
             addProduct: async (productData) => {
                 try {
-                    const response = await fetch('https://furniturepoint-website-k3j7.onrender.com/api/products', {
+                    const response = await fetch('https://furniturepoint-website.onrender.com/api/products', {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify(productData)
@@ -538,7 +538,7 @@ const useStore = create(
                     const currentProduct = get().products.find(p => p.id === productId)
                     const updatedProduct = { ...currentProduct, ...updates }
 
-                    const response = await fetch(`https://furniturepoint-website-k3j7.onrender.com/api/products/${productId}`, {
+                    const response = await fetch(`https://furniturepoint-website.onrender.com/api/products/${productId}`, {
                         method: 'PUT',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify(updatedProduct)
@@ -558,7 +558,7 @@ const useStore = create(
             deleteProduct: async (productId) => {
                 try {
                     const product = get().products.find(p => p.id === productId)
-                    const response = await fetch(`https://furniturepoint-website-k3j7.onrender.com/api/products/${productId}`, {
+                    const response = await fetch(`https://furniturepoint-website.onrender.com/api/products/${productId}`, {
                         method: 'DELETE'
                     })
                     if (response.ok) {
@@ -596,7 +596,7 @@ const useStore = create(
             // ==================
             fetchCategories: async () => {
                 try {
-                    const response = await fetch('https://furniturepoint-website-k3j7.onrender.com/api/categories')
+                    const response = await fetch('https://furniturepoint-website.onrender.com/api/categories')
                     if (response.ok) {
                         const data = await response.json()
                         set({ categories: data })
@@ -608,7 +608,7 @@ const useStore = create(
 
             addCategory: async (categoryData) => {
                 try {
-                    const response = await fetch('https://furniturepoint-website-k3j7.onrender.com/api/categories', {
+                    const response = await fetch('https://furniturepoint-website.onrender.com/api/categories', {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify(categoryData)
@@ -626,7 +626,7 @@ const useStore = create(
 
             updateCategory: async (categoryId, updates) => {
                 try {
-                    const response = await fetch(`https://furniturepoint-website-k3j7.onrender.com/api/categories/${categoryId}`, {
+                    const response = await fetch(`https://furniturepoint-website.onrender.com/api/categories/${categoryId}`, {
                         method: 'PUT',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify(updates)
@@ -644,7 +644,7 @@ const useStore = create(
 
             deleteCategory: async (categoryId) => {
                 try {
-                    const response = await fetch(`https://furniturepoint-website-k3j7.onrender.com/api/categories/${categoryId}`, {
+                    const response = await fetch(`https://furniturepoint-website.onrender.com/api/categories/${categoryId}`, {
                         method: 'DELETE'
                     })
                     if (response.ok) {
@@ -663,7 +663,7 @@ const useStore = create(
             // ==================
             fetchSubcategories: async () => {
                 try {
-                    const response = await fetch('https://furniturepoint-website-k3j7.onrender.com/api/subcategories')
+                    const response = await fetch('https://furniturepoint-website.onrender.com/api/subcategories')
                     if (response.ok) {
                         const data = await response.json()
                         set({ subcategories: data })
@@ -675,7 +675,7 @@ const useStore = create(
 
             addSubcategory: async (subcategoryData) => {
                 try {
-                    const response = await fetch('https://furniturepoint-website-k3j7.onrender.com/api/subcategories', {
+                    const response = await fetch('https://furniturepoint-website.onrender.com/api/subcategories', {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify(subcategoryData)
@@ -694,7 +694,7 @@ const useStore = create(
             updateSubcategory: async (subcategoryId, updates) => {
                 try {
                     const currentSub = get().subcategories.find(s => s.id === subcategoryId)
-                    const response = await fetch(`https://furniturepoint-website-k3j7.onrender.com/api/subcategories/${subcategoryId}`, {
+                    const response = await fetch(`https://furniturepoint-website.onrender.com/api/subcategories/${subcategoryId}`, {
                         method: 'PUT',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({ ...currentSub, ...updates })
@@ -712,7 +712,7 @@ const useStore = create(
 
             deleteSubcategory: async (subcategoryId) => {
                 try {
-                    const response = await fetch(`https://furniturepoint-website-k3j7.onrender.com/api/subcategories/${subcategoryId}`, {
+                    const response = await fetch(`https://furniturepoint-website.onrender.com/api/subcategories/${subcategoryId}`, {
                         method: 'DELETE'
                     })
                     if (response.ok) {
@@ -731,7 +731,7 @@ const useStore = create(
             // ==================
             addMaterial: async (materialName) => {
                 try {
-                    const response = await fetch('https://furniturepoint-website-k3j7.onrender.com/api/materials', {
+                    const response = await fetch('https://furniturepoint-website.onrender.com/api/materials', {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({ name: materialName })
@@ -751,7 +751,7 @@ const useStore = create(
 
             addColor: async (colorName) => {
                 try {
-                    const response = await fetch('https://furniturepoint-website-k3j7.onrender.com/api/colors', {
+                    const response = await fetch('https://furniturepoint-website.onrender.com/api/colors', {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({ name: colorName, hex_code: '#000000' })
@@ -771,7 +771,7 @@ const useStore = create(
 
             addStyle: async (styleName) => {
                 try {
-                    const response = await fetch('https://furniturepoint-website-k3j7.onrender.com/api/styles', {
+                    const response = await fetch('https://furniturepoint-website.onrender.com/api/styles', {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({ name: styleName })
@@ -796,7 +796,7 @@ const useStore = create(
 
             fetchAuditLogs: async () => {
                 try {
-                    const response = await fetch('https://furniturepoint-website-k3j7.onrender.com/api/audit-logs')
+                    const response = await fetch('https://furniturepoint-website.onrender.com/api/audit-logs')
                     if (response.ok) {
                         const data = await response.json()
                         set({ auditLog: data })
@@ -1022,7 +1022,7 @@ const useStore = create(
 
             fetchInquiries: async () => {
                 try {
-                    const response = await fetch('https://furniturepoint-website-k3j7.onrender.com/api/inquiries')
+                    const response = await fetch('https://furniturepoint-website.onrender.com/api/inquiries')
                     if (response.ok) {
                         const data = await response.json()
                         set({ inquiries: data })
@@ -1034,7 +1034,7 @@ const useStore = create(
 
             updateInquiryStatus: async (id, status) => {
                 try {
-                    const response = await fetch(`https://furniturepoint-website-k3j7.onrender.com/api/inquiries/${id}/status`, {
+                    const response = await fetch(`https://furniturepoint-website.onrender.com/api/inquiries/${id}/status`, {
                         method: 'PUT',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({ status })
@@ -1053,7 +1053,7 @@ const useStore = create(
 
             deleteInquiry: async (id) => {
                 try {
-                    const response = await fetch(`https://furniturepoint-website-k3j7.onrender.com/api/inquiries/${id}`, {
+                    const response = await fetch(`https://furniturepoint-website.onrender.com/api/inquiries/${id}`, {
                         method: 'DELETE'
                     })
                     if (response.ok) {
