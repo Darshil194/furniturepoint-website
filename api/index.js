@@ -6,8 +6,16 @@ import { fileURLToPath } from 'url';
 import path from 'path';
 import fs from 'fs';
 import multer from 'multer';
+import { v2 as cloudinary } from 'cloudinary';
 
 dotenv.config();
+
+// Cloudinary Configuration
+cloudinary.config({
+    cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+    api_key: process.env.CLOUDINARY_API_KEY,
+    api_secret: process.env.CLOUDINARY_API_SECRET
+});
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -27,16 +35,8 @@ if (!fs.existsSync(uploadsDir)) {
 }
 app.use('/uploads', express.static(uploadsDir));
 
-// Multer Storage Config
-const storage = multer.diskStorage({
-    destination: function (req, file, cb) {
-        cb(null, uploadsDir);
-    },
-    filename: function (req, file, cb) {
-        const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
-        cb(null, uniqueSuffix + path.extname(file.originalname));
-    }
-});
+// Multer Memory Storage Config (for Cloudinary)
+const storage = multer.memoryStorage();
 
 // Multer file filter - only allow jpg, png, webp
 const fileFilter = (req, file, cb) => {
@@ -140,27 +140,55 @@ app.get('/api/health', (req, res) => {
 // =======================
 // UPLOAD ENDPOINT
 // =======================
-app.post('/api/upload', (req, res) => {
-    upload.single('image')(req, res, (err) => {
-        if (err) {
-            console.error('Multer upload error:', err);
-            if (err.code === 'LIMIT_FILE_SIZE') {
-                return res.status(400).json({ error: 'File too large. Maximum size is 3MB.' });
-            }
-            return res.status(400).json({ error: err.message || 'File upload failed' });
-        }
-
+app.post('/api/upload', upload.single('image'), async (req, res) => {
+    try {
         if (!req.file) {
             return res.status(400).json({ error: 'No file uploaded' });
         }
 
-        console.log('File uploaded successfully:', req.file.filename);
-        // Production (Render): return full URL so frontend stores absolute path
-        // Local dev: return relative path (Vite proxy handles it)
-        const baseUrl = process.env.RENDER_EXTERNAL_URL || '';
-        const imageUrl = `${baseUrl}/uploads/${req.file.filename}`;
-        res.json({ url: imageUrl });
-    });
+        // Upload to Cloudinary using a buffer
+        const uploadToCloudinary = () => {
+            return new Promise((resolve, reject) => {
+                const uploadStream = cloudinary.uploader.upload_stream(
+                    {
+                        folder: 'furniture_point', // Optional: subfolder in Cloudinary
+                        resource_type: 'auto'
+                    },
+                    (error, result) => {
+                        if (error) {
+                            console.error('Cloudinary upload error:', error);
+                            reject(error);
+                        } else {
+                            resolve(result);
+                        }
+                    }
+                );
+                uploadStream.end(req.file.buffer);
+            });
+        };
+
+        const result = await uploadToCloudinary();
+        console.log('File uploaded to Cloudinary successfully:', result.secure_url);
+
+        res.json({ url: result.secure_url });
+    } catch (err) {
+        console.error('Upload handler error:', err);
+        // Providing more descriptive error for debugging
+        res.status(500).json({ error: 'Failed to upload image to cloud storage: ' + (err.message || String(err)) });
+    }
+});
+
+// Error handling middleware (catches Multer errors)
+app.use((err, req, res, next) => {
+    if (err instanceof multer.MulterError) {
+        if (err.code === 'LIMIT_FILE_SIZE') {
+            return res.status(400).json({ error: 'File too large. Maximum size is 3MB.' });
+        }
+        return res.status(400).json({ error: 'Multer error: ' + err.message });
+    } else if (err) {
+        return res.status(500).json({ error: err.message || 'Internal Server Error' });
+    }
+    next();
 });
 
 // =======================

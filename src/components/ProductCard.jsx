@@ -5,14 +5,21 @@ import QuickViewModal from './QuickViewModal'
 import './ProductCard.css'
 
 // Helper to extract image URL from various formats
+const API_BASE_URL = import.meta.env.VITE_API_URL || ''
+
 const getImageUrl = (images) => {
     if (!images || images.length === 0) return '/placeholder.png'
     const firstImage = images[0]
+
+    let url = ''
     // Handle object format: {url: '...'} or {url: '...', isPrimary: true}
-    if (typeof firstImage === 'object' && firstImage.url) return firstImage.url
+    if (typeof firstImage === 'object' && firstImage.url) url = firstImage.url
     // Handle plain string format
-    if (typeof firstImage === 'string') return firstImage
-    return '/placeholder.png'
+    else if (typeof firstImage === 'string') url = firstImage
+    else return '/placeholder.png'
+
+    // Return absolute URL or prefix relative URL
+    return url.startsWith('http') ? url : `${API_BASE_URL}${url}`
 }
 
 function ProductCard({ product, index = 0 }) {

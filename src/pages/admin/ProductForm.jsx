@@ -653,7 +653,7 @@ const ProductForm = () => {
                             {formData.images.map((img, index) => (
                                 <div key={index} className="image-preview__item" style={{ aspectRatio: '1', borderRadius: '8px', overflow: 'hidden', position: 'relative', border: img.isPrimary ? '2px solid var(--accent)' : '1px solid rgba(255,255,255,0.1)' }}>
                                     <img
-                                        src={img.url}
+                                        src={img.url.startsWith('http') ? img.url : `${import.meta.env.VITE_API_URL || ''}${img.url}`}
                                         alt={`Product ${index}`}
                                         style={{ width: '100%', height: '100%', objectFit: 'cover' }}
                                     />

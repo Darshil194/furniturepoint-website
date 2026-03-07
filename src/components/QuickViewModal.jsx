@@ -5,12 +5,21 @@ import useStore from '../store/useStore'
 import './QuickViewModal.css'
 
 // Helper to normalize images
+const API_BASE_URL = import.meta.env.VITE_API_URL || ''
+
 const normalizeImages = (images) => {
     if (!images || images.length === 0) return [{ url: '/placeholder.png' }]
+
     return images.map(img => {
-        if (typeof img === 'string') return { url: img }
-        if (typeof img === 'object' && img.url) return img
-        return { url: '/placeholder.png' }
+        let url = ''
+        if (typeof img === 'string') url = img
+        else if (typeof img === 'object' && img.url) url = img.url
+        else url = '/placeholder.png'
+
+        return {
+            url: url.startsWith('http') ? url : `${API_BASE_URL}${url}`,
+            isPrimary: typeof img === 'object' ? img.isPrimary : false
+        }
     })
 }
 
