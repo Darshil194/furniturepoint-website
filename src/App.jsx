@@ -55,7 +55,8 @@ function App() {
                 useStore.getState().fetchProducts(),
                 useStore.getState().fetchCategories(),
                 useStore.getState().fetchSubcategories(),
-                useStore.getState().fetchAuxiliaryData()
+                useStore.getState().fetchAuxiliaryData(),
+                useStore.getState().fetchPolicies()
             ])
         }
         initializeData()

@@ -3,7 +3,7 @@ import { Plus, Edit, Trash2, FolderTree, ChevronRight, Upload, X, Image } from '
 import useStore from '../../store/useStore';
 import EditableSelect from '../../components/common/EditableSelect';
 
-const API_BASE_URL = 'https://furniturepoint-website.onrender.com';
+const API_BASE_URL = import.meta.env.VITE_API_URL || '';
 
 const CategoryManager = () => {
     const {

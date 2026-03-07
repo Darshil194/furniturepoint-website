@@ -64,6 +64,10 @@ function generateSlug(name) {
         .replace(/-+/g, '-');
 }
 
+// Helper to safely convert values (correctly handles 0, null, and empty strings)
+const toInt = (val) => (val !== undefined && val !== null && val !== '') ? parseInt(val) : null;
+const toFloat = (val) => (val !== undefined && val !== null && val !== '') ? parseFloat(val) : null;
+
 // Database Connection
 const sql = neon(process.env.DATABASE_URL);
 
@@ -516,9 +520,6 @@ app.post('/api/products', async (req, res) => {
         }
 
         // Handle integers for IDs (convert '' to null)
-        // Helper to safely convert values (correctly handles 0, null, and empty strings)
-        const toInt = (val) => (val !== undefined && val !== null && val !== '') ? parseInt(val) : null;
-        const toFloat = (val) => (val !== undefined && val !== null && val !== '') ? parseFloat(val) : null;
 
         const result = await sql`
             INSERT INTO products (

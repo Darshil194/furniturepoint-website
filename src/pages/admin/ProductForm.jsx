@@ -580,7 +580,8 @@ const ProductForm = () => {
 
                                 try {
                                     // Visual feedback (optional: add loading state)
-                                    const res = await fetch('/api/upload', {
+                                    const API_BASE_URL = import.meta.env.VITE_API_URL || '';
+                                    const res = await fetch(`${API_BASE_URL}/api/upload`, {
                                         method: 'POST',
                                         body: uploadData
                                     });

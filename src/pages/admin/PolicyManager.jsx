@@ -19,10 +19,10 @@ const PolicyManager = () => {
         }
     }, [selectedType, policies])
 
-    const handleSave = () => {
+    const handleSave = async () => {
         setSaveStatus('saving')
         try {
-            updatePolicy(selectedType, content)
+            await updatePolicy(selectedType, content)
             setIsDirty(false)
             setSaveStatus('success')
 

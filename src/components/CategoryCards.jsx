@@ -2,7 +2,7 @@ import { Link } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import { ArrowRight } from 'lucide-react'
 
-const API_BASE_URL = 'https://furniturepoint-website.onrender.com'
+const API_BASE_URL = import.meta.env.VITE_API_URL || ''
 const PLACEHOLDER_IMAGE = '/images/category-placeholder.jpg'
 
 // Generate URL-friendly slug from name (fallback when API data lacks slug field)
