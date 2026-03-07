@@ -18,8 +18,8 @@ const CategoryManager = () => {
         products
     } = useStore();
 
-    const [editingCategory, setEditingCategory] = useState(null);
-    const [editingSubcategory, setEditingSubcategory] = useState(null);
+    const [editingCategory, setEditingCategory] = useState(null); // null or { id, name, description, imageUrl }
+    const [editingSubcategory, setEditingSubcategory] = useState(null); // null or { id, categoryId, name, description, imageUrl }
     const [newCategory, setNewCategory] = useState({ name: '', description: '', imageUrl: '' });
     const [newSubcategory, setNewSubcategory] = useState({ categoryId: '', name: '', description: '', imageUrl: '' });
     const [showAddCategory, setShowAddCategory] = useState(false);
@@ -28,6 +28,8 @@ const CategoryManager = () => {
 
     const catImageRef = useRef(null);
     const subImageRef = useRef(null);
+    const editCatImageRef = useRef(null);
+    const editSubImageRef = useRef(null);
 
     // Upload image helper
     const handleImageUpload = async (file, setStateFn, stateObj) => {
@@ -375,35 +377,9 @@ const CategoryManager = () => {
 
                                     <FolderTree size={20} style={{ color: 'var(--accent)', marginRight: '0.75rem' }} />
 
-                                    {editingCategory === category.id ? (
-                                        <input
-                                            type="text"
-                                            defaultValue={category.name}
-                                            onBlur={(e) => {
-                                                updateCategory(category.id, { name: e.target.value });
-                                                setEditingCategory(null);
-                                            }}
-                                            onKeyDown={(e) => {
-                                                if (e.key === 'Enter') {
-                                                    updateCategory(category.id, { name: e.target.value });
-                                                    setEditingCategory(null);
-                                                }
-                                            }}
-                                            autoFocus
-                                            style={{
-                                                background: 'rgba(0, 0, 0, 0.3)',
-                                                border: '1px solid var(--accent)',
-                                                borderRadius: '6px',
-                                                padding: '0.5rem',
-                                                color: 'var(--text-primary)',
-                                                width: '200px'
-                                            }}
-                                        />
-                                    ) : (
-                                        <span style={{ color: 'var(--text-primary)', fontWeight: 500, flex: 1 }}>
-                                            {category.name}
-                                        </span>
-                                    )}
+                                    <span style={{ color: 'var(--text-primary)', fontWeight: 500, flex: 1 }}>
+                                        {category.name}
+                                    </span>
 
                                     <span style={{
                                         color: 'var(--text-muted)',
@@ -416,7 +392,7 @@ const CategoryManager = () => {
                                     <div className="action-btns">
                                         <button
                                             className="action-btn action-btn--edit"
-                                            onClick={() => setEditingCategory(category.id)}
+                                            onClick={() => setEditingCategory({ id: category.id, name: category.name, description: category.description || '', imageUrl: category.imageUrl || '' })}
                                             title="Edit"
                                         >
                                             <Edit size={16} />
@@ -461,36 +437,9 @@ const CategoryManager = () => {
 
                                         <ChevronRight size={16} style={{ color: 'var(--text-muted)', marginRight: '0.5rem' }} />
 
-                                        {editingSubcategory === sub.id ? (
-                                            <input
-                                                type="text"
-                                                defaultValue={sub.name}
-                                                onBlur={(e) => {
-                                                    updateSubcategory(sub.id, { name: e.target.value });
-                                                    setEditingSubcategory(null);
-                                                }}
-                                                onKeyDown={(e) => {
-                                                    if (e.key === 'Enter') {
-                                                        updateSubcategory(sub.id, { name: e.target.value });
-                                                        setEditingSubcategory(null);
-                                                    }
-                                                }}
-                                                autoFocus
-                                                style={{
-                                                    background: 'rgba(0, 0, 0, 0.3)',
-                                                    border: '1px solid var(--accent)',
-                                                    borderRadius: '6px',
-                                                    padding: '0.4rem',
-                                                    color: 'var(--text-primary)',
-                                                    width: '180px',
-                                                    fontSize: '0.9rem'
-                                                }}
-                                            />
-                                        ) : (
-                                            <span style={{ color: 'var(--text-secondary)', flex: 1, fontSize: '0.9rem' }}>
-                                                {sub.name}
-                                            </span>
-                                        )}
+                                        <span style={{ color: 'var(--text-secondary)', flex: 1, fontSize: '0.9rem' }}>
+                                            {sub.name}
+                                        </span>
 
                                         <span style={{
                                             color: 'var(--text-muted)',
@@ -503,7 +452,7 @@ const CategoryManager = () => {
                                         <div className="action-btns">
                                             <button
                                                 className="action-btn action-btn--edit"
-                                                onClick={() => setEditingSubcategory(sub.id)}
+                                                onClick={() => setEditingSubcategory({ id: sub.id, categoryId: sub.categoryId, name: sub.name, description: sub.description || '', imageUrl: sub.imageUrl || '' })}
                                                 title="Edit"
                                                 style={{ width: '30px', height: '30px' }}
                                             >
@@ -525,6 +474,167 @@ const CategoryManager = () => {
                     </div>
                 )}
             </div>
+
+            {/* Edit Category Modal */}
+            {editingCategory && (
+                <div style={{
+                    position: 'fixed', inset: 0, zIndex: 1000,
+                    display: 'flex', alignItems: 'center', justifyContent: 'center'
+                }}>
+                    <div
+                        style={{ position: 'absolute', inset: 0, background: 'rgba(0,0,0,0.6)', backdropFilter: 'blur(4px)' }}
+                        onClick={() => setEditingCategory(null)}
+                    />
+                    <div style={{
+                        position: 'relative', background: 'var(--bg-secondary, #1a1a2e)',
+                        borderRadius: '16px', padding: '2rem', width: '100%', maxWidth: '480px',
+                        border: '1px solid rgba(255,255,255,0.1)', boxShadow: '0 20px 60px rgba(0,0,0,0.5)'
+                    }}>
+                        <h3 style={{ color: 'var(--text-primary)', marginBottom: '1.5rem', fontSize: '1.1rem' }}>
+                            Edit Category
+                        </h3>
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                            <div className="form-group" style={{ marginBottom: 0 }}>
+                                <label style={{ color: 'var(--text-secondary)', fontSize: '0.85rem', marginBottom: '0.3rem', display: 'block' }}>Name</label>
+                                <input
+                                    type="text"
+                                    value={editingCategory.name}
+                                    onChange={(e) => setEditingCategory({ ...editingCategory, name: e.target.value })}
+                                    placeholder="Category name"
+                                />
+                            </div>
+                            <div className="form-group" style={{ marginBottom: 0 }}>
+                                <label style={{ color: 'var(--text-secondary)', fontSize: '0.85rem', marginBottom: '0.3rem', display: 'block' }}>Description</label>
+                                <input
+                                    type="text"
+                                    value={editingCategory.description}
+                                    onChange={(e) => setEditingCategory({ ...editingCategory, description: e.target.value })}
+                                    placeholder="Description (optional)"
+                                />
+                            </div>
+                            <div>
+                                <label style={{ color: 'var(--text-secondary)', fontSize: '0.85rem', marginBottom: '0.5rem', display: 'block' }}>Image</label>
+                                <input
+                                    type="file"
+                                    ref={editCatImageRef}
+                                    accept=".jpg,.jpeg,.png,.webp"
+                                    style={{ display: 'none' }}
+                                    onChange={(e) => handleImageUpload(e.target.files[0], setEditingCategory, editingCategory)}
+                                />
+                                <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+                                    {editingCategory.imageUrl ? (
+                                        <ImagePreview
+                                            imageUrl={editingCategory.imageUrl}
+                                            onRemove={() => setEditingCategory({ ...editingCategory, imageUrl: '' })}
+                                            size={60}
+                                        />
+                                    ) : null}
+                                    <UploadButton inputRef={editCatImageRef} uploading={uploading} />
+                                </div>
+                            </div>
+                        </div>
+                        <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '0.75rem', marginTop: '1.5rem' }}>
+                            <button className="btn btn-secondary" onClick={() => setEditingCategory(null)}>
+                                Cancel
+                            </button>
+                            <button
+                                className="btn btn-primary"
+                                onClick={() => {
+                                    updateCategory(editingCategory.id, {
+                                        name: editingCategory.name,
+                                        description: editingCategory.description,
+                                        imageUrl: editingCategory.imageUrl
+                                    });
+                                    setEditingCategory(null);
+                                }}
+                            >
+                                Save Changes
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {/* Edit Subcategory Modal */}
+            {editingSubcategory && (
+                <div style={{
+                    position: 'fixed', inset: 0, zIndex: 1000,
+                    display: 'flex', alignItems: 'center', justifyContent: 'center'
+                }}>
+                    <div
+                        style={{ position: 'absolute', inset: 0, background: 'rgba(0,0,0,0.6)', backdropFilter: 'blur(4px)' }}
+                        onClick={() => setEditingSubcategory(null)}
+                    />
+                    <div style={{
+                        position: 'relative', background: 'var(--bg-secondary, #1a1a2e)',
+                        borderRadius: '16px', padding: '2rem', width: '100%', maxWidth: '480px',
+                        border: '1px solid rgba(255,255,255,0.1)', boxShadow: '0 20px 60px rgba(0,0,0,0.5)'
+                    }}>
+                        <h3 style={{ color: 'var(--text-primary)', marginBottom: '1.5rem', fontSize: '1.1rem' }}>
+                            Edit Subcategory
+                        </h3>
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                            <div className="form-group" style={{ marginBottom: 0 }}>
+                                <label style={{ color: 'var(--text-secondary)', fontSize: '0.85rem', marginBottom: '0.3rem', display: 'block' }}>Name</label>
+                                <input
+                                    type="text"
+                                    value={editingSubcategory.name}
+                                    onChange={(e) => setEditingSubcategory({ ...editingSubcategory, name: e.target.value })}
+                                    placeholder="Subcategory name"
+                                />
+                            </div>
+                            <div className="form-group" style={{ marginBottom: 0 }}>
+                                <label style={{ color: 'var(--text-secondary)', fontSize: '0.85rem', marginBottom: '0.3rem', display: 'block' }}>Description</label>
+                                <input
+                                    type="text"
+                                    value={editingSubcategory.description}
+                                    onChange={(e) => setEditingSubcategory({ ...editingSubcategory, description: e.target.value })}
+                                    placeholder="Description (optional)"
+                                />
+                            </div>
+                            <div>
+                                <label style={{ color: 'var(--text-secondary)', fontSize: '0.85rem', marginBottom: '0.5rem', display: 'block' }}>Image</label>
+                                <input
+                                    type="file"
+                                    ref={editSubImageRef}
+                                    accept=".jpg,.jpeg,.png,.webp"
+                                    style={{ display: 'none' }}
+                                    onChange={(e) => handleImageUpload(e.target.files[0], setEditingSubcategory, editingSubcategory)}
+                                />
+                                <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+                                    {editingSubcategory.imageUrl ? (
+                                        <ImagePreview
+                                            imageUrl={editingSubcategory.imageUrl}
+                                            onRemove={() => setEditingSubcategory({ ...editingSubcategory, imageUrl: '' })}
+                                            size={60}
+                                        />
+                                    ) : null}
+                                    <UploadButton inputRef={editSubImageRef} uploading={uploading} />
+                                </div>
+                            </div>
+                        </div>
+                        <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '0.75rem', marginTop: '1.5rem' }}>
+                            <button className="btn btn-secondary" onClick={() => setEditingSubcategory(null)}>
+                                Cancel
+                            </button>
+                            <button
+                                className="btn btn-primary"
+                                onClick={() => {
+                                    updateSubcategory(editingSubcategory.id, {
+                                        name: editingSubcategory.name,
+                                        description: editingSubcategory.description,
+                                        imageUrl: editingSubcategory.imageUrl,
+                                        categoryId: editingSubcategory.categoryId
+                                    });
+                                    setEditingSubcategory(null);
+                                }}
+                            >
+                                Save Changes
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 };

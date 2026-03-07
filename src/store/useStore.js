@@ -1069,7 +1069,7 @@ const useStore = create(
         }),
         {
             name: 'furniture-point-storage',
-            version: 2,
+            version: 3,
             migrate: (persistedState) => persistedState,
             partialize: (state) => ({
                 products: state.products,
