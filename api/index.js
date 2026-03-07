@@ -140,18 +140,25 @@ app.get('/api/health', (req, res) => {
 // =======================
 // UPLOAD ENDPOINT
 // =======================
-app.post('/api/upload', upload.single('image'), (req, res) => {
-    try {
+app.post('/api/upload', (req, res) => {
+    upload.single('image')(req, res, (err) => {
+        if (err) {
+            console.error('Multer upload error:', err);
+            if (err.code === 'LIMIT_FILE_SIZE') {
+                return res.status(400).json({ error: 'File too large. Maximum size is 3MB.' });
+            }
+            return res.status(400).json({ error: err.message || 'File upload failed' });
+        }
+
         if (!req.file) {
             return res.status(400).json({ error: 'No file uploaded' });
         }
-        // Return relative URL
+
+        console.log('File uploaded successfully:', req.file.filename);
+        // Return relative URL — frontend constructs full URL as needed
         const imageUrl = `/uploads/${req.file.filename}`;
         res.json({ url: imageUrl });
-    } catch (err) {
-        console.error('Upload error:', err);
-        res.status(500).json({ error: 'File upload failed' });
-    }
+    });
 });
 
 // =======================
