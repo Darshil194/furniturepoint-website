@@ -155,8 +155,10 @@ app.post('/api/upload', (req, res) => {
         }
 
         console.log('File uploaded successfully:', req.file.filename);
-        // Return relative URL — frontend constructs full URL as needed
-        const imageUrl = `/uploads/${req.file.filename}`;
+        // Production (Render): return full URL so frontend stores absolute path
+        // Local dev: return relative path (Vite proxy handles it)
+        const baseUrl = process.env.RENDER_EXTERNAL_URL || '';
+        const imageUrl = `${baseUrl}/uploads/${req.file.filename}`;
         res.json({ url: imageUrl });
     });
 });
